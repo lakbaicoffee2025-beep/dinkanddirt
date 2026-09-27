@@ -792,14 +792,14 @@ footer a:hover { color: var(--gold); }
       <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <span class="hero-logo-badge-fallback" style="display:none">🏓</span>
     </div>
-    <h1 class="hero-title">DINK &amp; DIRT</h1>
-    <p class="hero-sub1">Pickleball &amp; RC Crawler Park</p>
-    <p class="hero-sub2">Play · Crawl · Repeat</p>
+    <h1 class="hero-title" data-text="heroTitle">DINK &amp; DIRT</h1>
+    <p class="hero-sub1" data-text="heroSub1">Pickleball &amp; RC Crawler Park</p>
+    <p class="hero-sub2" data-text="heroSub2">Play · Crawl · Repeat</p>
     <div class="hero-divider"></div>
     <div class="hero-cta-icon" onclick="openRulesModal()"><img id="ctaIconImg" src="/assets/pickleball.webp" alt="Pickleball" style="width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))"></div>
-    <div class="hero-cta-text" onclick="openRulesModal()">TAP TO BOOK</div>
-    <p class="hero-cta-sub">Select a date and reserve your slot</p>
-    <p class="hero-location">Dink &amp; Dirt &nbsp;·&nbsp; Pickleball &amp; RC Crawler Park</p>
+    <div class="hero-cta-text" onclick="openRulesModal()" data-text="heroCta">TAP TO BOOK</div>
+    <p class="hero-cta-sub" data-text="heroCtaSub">Select a date and reserve your slot</p>
+    <p class="hero-location" data-text="heroLocation" style="white-space:pre-wrap">Dink &amp; Dirt  ·  Pickleball &amp; RC Crawler Park</p>
   </div>
 
   <button class="carousel-btn prev" onclick="carouselMove(-1)">‹</button>
@@ -811,51 +811,51 @@ footer a:hover { color: var(--gold); }
 <div class="modal-overlay" id="rulesModal">
   <div class="modal-box">
     <div class="modal-head">
-      <h2>BEFORE YOU BOOK</h2>
-      <p>Booking &amp; Court Rules</p>
+      <h2 data-text="rulesTitle">BEFORE YOU BOOK</h2>
+      <p data-text="rulesSubtitle">Booking &amp; Court Rules</p>
     </div>
     <div class="modal-body">
-      <p style="font-size:.83rem;color:var(--text2);margin-bottom:14px;line-height:1.6">Please take a moment to read these rules. They help every booking start safely and on time.</p>
+      <p style="font-size:.83rem;color:var(--text2);margin-bottom:14px;line-height:1.6" data-text="rulesIntro">Please take a moment to read these rules. They help every booking start safely and on time.</p>
       <div class="rule-item">
         <div class="rule-num">1</div>
         <div>
-          <div class="rule-title">⏰ Arrive on time</div>
-          <div class="rule-body">Please arrive 10 minutes early to warm up. Your slot begins and ends at the exact times you booked.</div>
+          <div class="rule-title" data-text="rule1Title">⏰ Arrive on time</div>
+          <div class="rule-body" data-text="rule1Body">Please arrive 10 minutes early to warm up. Your slot begins and ends at the exact times you booked.</div>
         </div>
       </div>
       <div class="rule-item">
         <div class="rule-num">2</div>
         <div>
-          <div class="rule-title">🚫 No cancellations after booking</div>
-          <div class="rule-body">Cancellations must be made at least 6 hours before your scheduled time. No-shows and late cancellations are non-refundable.</div>
+          <div class="rule-title" data-text="rule2Title">🚫 No cancellations after booking</div>
+          <div class="rule-body" data-text="rule2Body">Cancellations must be made at least 6 hours before your scheduled time. No-shows and late cancellations are non-refundable.</div>
         </div>
       </div>
       <div class="rule-item">
         <div class="rule-num">3</div>
         <div>
-          <div class="rule-title">🔄 Rebooking policy</div>
-          <div class="rule-body">Rebooking requests must be made at least 6 hours in advance and are subject to court availability. Contact us at 0976-040-2293 to rebook.</div>
+          <div class="rule-title" data-text="rule3Title">🔄 Rebooking policy</div>
+          <div class="rule-body" data-text="rule3Body">Rebooking requests must be made at least 6 hours in advance and are subject to court availability. Contact us to rebook.</div>
         </div>
       </div>
       <div class="rule-item">
         <div class="rule-num">4</div>
         <div>
-          <div class="rule-title">🌧️ Weather cancellations</div>
-          <div class="rule-body">This is an outdoor court. In case of rain or a natural calamity, we will contact you to reschedule at no extra charge.</div>
+          <div class="rule-title" data-text="rule4Title">🌧️ Weather cancellations</div>
+          <div class="rule-body" data-text="rule4Body">This is an outdoor court. In case of rain or a natural calamity, we will contact you to reschedule at no extra charge.</div>
         </div>
       </div>
       <div class="rule-item">
         <div class="rule-num">5</div>
         <div>
-          <div class="rule-title">💰 Payment required to confirm</div>
-          <div class="rule-body">Upload your GCash or cash payment screenshot to secure your slot. Your booking is only confirmed upon receipt of payment.</div>
+          <div class="rule-title" data-text="rule5Title">💰 Payment required to confirm</div>
+          <div class="rule-body" data-text="rule5Body">Upload your GCash or cash payment screenshot to secure your slot. Your booking is only confirmed upon receipt of payment.</div>
         </div>
       </div>
       <div class="rule-item">
         <div class="rule-num">6</div>
         <div>
-          <div class="rule-title">🤝 Respect the court &amp; players</div>
-          <div class="rule-body">Be kind to all players. Vacate the court promptly when your time is up so the next booking can start on time.</div>
+          <div class="rule-title" data-text="rule6Title">🤝 Respect the court &amp; players</div>
+          <div class="rule-body" data-text="rule6Body">Be kind to all players. Vacate the court promptly when your time is up so the next booking can start on time.</div>
         </div>
       </div>
     </div>
@@ -874,13 +874,13 @@ footer a:hover { color: var(--gold); }
     <div class="topbar-logo">
       <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" onerror="this.style.display='none'">
       <div class="topbar-logo-text">
-        <div class="tl-name">DINK &amp; DIRT</div>
-        <div class="tl-loc">Pickleball &amp; RC Crawler Park</div>
+        <div class="tl-name" data-text="topbarName">DINK &amp; DIRT</div>
+        <div class="tl-loc" data-text="topbarSub">Pickleball &amp; RC Crawler Park</div>
       </div>
     </div>
-    <div class="topbar-tagline">Play · Crawl · Repeat</div>
-    <div class="topbar-contact">
-      <a href="tel:09760402293">📞 0976-040-2293</a>
+    <div class="topbar-tagline" data-text="topbarTagline">Play · Crawl · Repeat</div>
+    <div class="topbar-contact" data-show-if="phone" style="display:none">
+      <a data-tel>📞 <span data-text="phone"></span></a>
     </div>
   </div>
 
@@ -896,17 +896,17 @@ footer a:hover { color: var(--gold); }
     <!-- SUCCESS SCREEN -->
     <div class="success-screen" id="successScreen">
       <div class="success-icon">🎉</div>
-      <h2>BOOKING CONFIRMED!</h2>
-      <p>See you on the court! Your spot is secured.</p>
+      <h2 data-text="successTitle">BOOKING CONFIRMED!</h2>
+      <p data-text="successMessage">See you on the court! Your spot is secured.</p>
       <div class="bk-card" id="confirmCard"></div>
-      <p style="font-size:.78rem;color:var(--text3);margin-top:8px">Questions? Call <strong style="color:var(--text2)">0976-040-2293</strong></p>
+      <p style="font-size:.78rem;color:var(--text3);margin-top:8px;display:none" data-show-if="phone">Questions? Call <strong style="color:var(--text2)" data-text="phone"></strong></p>
       <button class="btn-new" onclick="resetBooking()">📅 BOOK ANOTHER SLOT</button>
     </div>
 
     <div id="bookingLayout">
       <div class="bk-heading">
-        <h1>SELECT YOUR DATE &amp; TIME</h1>
-        <p>Choose a date on the calendar, then pick your available time slots below.</p>
+        <h1 data-text="bookingHeading">SELECT YOUR DATE &amp; TIME</h1>
+        <p data-text="bookingSubheading">Choose a date on the calendar, then pick your available time slots below.</p>
       </div>
 
       <div class="steps">
@@ -947,8 +947,8 @@ footer a:hover { color: var(--gold); }
           <div class="panel-hd">📋 Your Booking Details</div>
           <div class="panel-bd">
             <div class="outdoor-notice">
-              <strong>⛅ Outdoor Court Notice</strong>
-              This is an outdoor pickleball court. Please check the weather before heading out. Games may be affected by rain or extreme heat.
+              <strong data-text="noticeTitle">⛅ Outdoor Court Notice</strong>
+              <span data-text="noticeBody">This is an outdoor pickleball court. Please check the weather before heading out. Games may be affected by rain or extreme heat.</span>
             </div>
             <div class="bk-summary" id="bookingSummary">
               <div class="sum-empty">Select a date &amp; time first →</div>
@@ -960,15 +960,15 @@ footer a:hover { color: var(--gold); }
             <div class="fg">
               <label>Payment Info</label>
               <div class="pay-box">
-                <div class="pay-title">💰 Pay via GCash · ₱250/Hour</div>
-                <div class="pay-number-box">
+                <div class="pay-title" data-text="payTitle">💰 Pay via GCash · ₱250/Hour</div>
+                <div class="pay-number-box" data-show-if="gcashNumber" style="display:none">
                   <span class="pay-lbl">GCash Number</span>
-                  <a href="tel:09760402293" class="pay-val">0976-040-2293</a>
+                  <a class="pay-val" data-text="gcashNumber" data-tel-of="gcashNumber"></a>
                 </div>
-                <div class="pay-name">Account Name: <strong>RO**E L.</strong></div>
+                <div class="pay-name" data-show-if="gcashName" style="display:none">Account Name: <strong data-text="gcashName"></strong></div>
                 <div class="pay-divider" id="payQrDivider" style="display:none"><span>or scan QR</span></div>
                 <img alt="GCash QR Code" class="pay-qr" style="display:none">
-                <div class="pay-hint">After paying, upload your receipt screenshot below to secure your slot.</div>
+                <div class="pay-hint" data-text="payHint">After paying, upload your receipt screenshot below to secure your slot.</div>
               </div>
             </div>
             <div class="fg">
@@ -994,14 +994,17 @@ footer a:hover { color: var(--gold); }
     <div style="margin-bottom:6px">
       <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" style="height:44px;margin:0 auto 5px;border-radius:50%;background:#fff;opacity:.85">
     </div>
-    <div>📞 <a href="tel:09760402293">0976-040-2293</a> &nbsp;·&nbsp; Court Opens 1PM–12MN</div>
-    <div style="margin-top:6px;opacity:.4">© 2026 Dink &amp; Dirt Pickleball &amp; RC Crawler Park</div>
+    <div><span data-show-if="phone" style="display:none">📞 <a data-tel><span data-text="phone"></span></a> &nbsp;·&nbsp; </span><span data-text="footerHours">Court Opens 1PM–12MN</span></div>
+    <div id="socialLinks" style="margin-top:6px;display:none"></div>
+    <div style="margin-top:6px;opacity:.4" data-text="footerCopyright">© 2026 Dink &amp; Dirt Pickleball &amp; RC Crawler Park</div>
   </footer>
 </div>
 
 
+<script src="/site-content.js"></script>
 <script>
 const API='/api/bookings';
+let PRICE_PER_HOUR=250;
 const OPEN_HOUR=13;
 const CLOSE_HOUR=23;
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1100,6 +1103,42 @@ async function initHero(){
   }catch(e){
     initCarousel(document.querySelectorAll('.carousel-slide').length);
   }
+}
+
+/* ── SITE TEXT & SOCIAL LINKS (edited in admin) ── */
+function applySiteText(saved){
+  const C=window.SITE_CONTENT;
+  const vals={...C.defaults,...((saved&&saved.text)||{})};
+  const price=Number(vals.pricePerHour);
+  if(price>0)PRICE_PER_HOUR=price;
+  vals.pricePerHour=PRICE_PER_HOUR.toLocaleString();
+  document.title=C.render(vals.siteTitle,vals);
+  document.querySelectorAll('[data-text]').forEach(el=>{el.textContent=C.render(vals[el.dataset.text],vals);});
+  document.querySelectorAll('[data-show-if]').forEach(el=>{el.style.display=vals[el.dataset.showIf]?'':'none';});
+  const tel=v=>'tel:'+String(v||'').replace(/[^\d+]/g,'');
+  document.querySelectorAll('a[data-tel]').forEach(a=>a.href=tel(vals.phone));
+  document.querySelectorAll('a[data-tel-of]').forEach(a=>a.href=tel(vals[a.dataset.telOf]));
+  const social=(saved&&saved.social)||{};
+  const box=document.getElementById('socialLinks');
+  box.innerHTML='';
+  C.social.filter(x=>C.isSafeUrl(social[x.key])).forEach((x,i)=>{
+    if(i)box.append(' \u00a0·\u00a0 ');
+    const a=document.createElement('a');
+    a.href=social[x.key].trim();a.target='_blank';a.rel='noopener';a.textContent=x.label;
+    box.appendChild(a);
+  });
+  box.style.display=box.children.length?'':'none';
+}
+async function initSiteText(){
+  let cached=null;
+  try{cached=JSON.parse(localStorage.getItem('dd_site_text')||'null');}catch(e){}
+  applySiteText(cached);
+  try{
+    const r=await fetch(`${API}/site-text`);
+    const d=await r.json();
+    applySiteText(d);
+    try{localStorage.setItem('dd_site_text',JSON.stringify(d));}catch(e){}
+  }catch(e){}
 }
 
 /* ── SITE IMAGES (logo, background, QR, icon — set in admin) ── */
@@ -1251,7 +1290,7 @@ function renderDateSlotsContainer(){
         sl.textContent=takenBy.type==='block'?'Blocked':takenBy.type==='open_play'?'Open Play':'Booked';
         el.appendChild(sl);
       }else{
-        const pr=document.createElement('div');pr.className='ts-price';pr.textContent='₱250';
+        const pr=document.createElement('div');pr.className='ts-price';pr.textContent='₱'+PRICE_PER_HOUR.toLocaleString();
         el.appendChild(pr);
       }
 
@@ -1301,7 +1340,7 @@ function updateSummary(){
     grandTotal+=slots.size;
     html+=`<div style="border-bottom:1px solid var(--border2);padding-bottom:8px;margin-bottom:8px"><div class="sum-row" style="margin-bottom:3px"><span style="font-weight:600;color:#fff">📅 ${dateLabel}</span></div>${timeRows}</div>`;
   }
-  html+=`<div class="sum-row"><span>Total Hours</span><span>${grandTotal}h</span></div><div class="sum-row total"><span>Total Due</span><span>₱${(grandTotal*250).toLocaleString()}</span></div>`;
+  html+=`<div class="sum-row"><span>Total Hours</span><span>${grandTotal}h</span></div><div class="sum-row total"><span>Total Due</span><span>₱${(grandTotal*PRICE_PER_HOUR).toLocaleString()}</span></div>`;
   el.innerHTML=html;
 }
 
@@ -1363,6 +1402,7 @@ async function submitBooking(){
   const btn=document.getElementById('submitBtn');
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span>SECURING...';
   const submittedBookings=[];let firstCall=true;
+  const txnId=Date.now().toString(36)+Math.random().toString(36).slice(2,10); // groups this checkout's bookings into one transaction
   try{
     for(const[dateStr,slots] of bulkSelections){
       if(!slots.size)continue;
@@ -1371,7 +1411,7 @@ async function submitBooking(){
         const res=await fetch(API,{
           method:'POST',
           headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({name,phone,notes,date:dateStr,startHour:start,endHour:end,paymentData:firstCall?paymentBase64:null,paymentType:firstCall?paymentType:null})
+          body:JSON.stringify({txnId,name,phone,notes,date:dateStr,startHour:start,endHour:end,paymentData:firstCall?paymentBase64:null,paymentType:firstCall?paymentType:null})
         });
         const data=await res.json();
         if(!res.ok){
@@ -1411,7 +1451,7 @@ function showSuccess(bookings,name,phone){
     <div class="bc-row"><span>Phone</span><span>${phone}</span></div>
     ${dateRows}
     <div class="bc-row"><span>Total Duration</span><span>${totalHours}h</span></div>
-    <div class="bc-row" style="color:var(--gold);font-weight:700"><span>Total Due</span><span>₱${(totalHours*250).toLocaleString()}</span></div>
+    <div class="bc-row" style="color:var(--gold);font-weight:700"><span>Total Due</span><span>₱${(totalHours*PRICE_PER_HOUR).toLocaleString()}</span></div>
     <div class="bc-row"><span>Status</span><span style="color:#7ACA50">✅ Confirmed</span></div>
   `;
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1449,7 +1489,7 @@ async function initBanner(){
 }
 
 initSiteImages();
-(async()=>{await Promise.all([loadSettings(),initHero(),initBanner()]);renderCalendar();})();
+(async()=>{await Promise.all([loadSettings(),initHero(),initBanner(),initSiteText()]);renderCalendar();})();
 </script>
 </body>
 </html>

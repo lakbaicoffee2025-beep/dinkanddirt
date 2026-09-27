@@ -1,6 +1,27 @@
 import { getStore } from "@netlify/blobs";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "dinkanddirt2024admin";
+// Super admin (site owner's billing view). Disabled until SUPER_ADMIN_PASSWORD is set in Netlify.
+const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD || "";
+const COMMISSION_PER_TRANSACTION = Number(process.env.COMMISSION_PER_TRANSACTION || 10);
+const TEXT_KEYS = ["siteTitle", "phone", "pricePerHour", "heroTitle", "heroSub1", "heroSub2", "heroCta", "heroCtaSub", "heroLocation",
+  "topbarName", "topbarSub", "topbarTagline", "rulesTitle", "rulesSubtitle", "rulesIntro",
+  "rule1Title", "rule1Body", "rule2Title", "rule2Body", "rule3Title", "rule3Body", "rule4Title", "rule4Body",
+  "rule5Title", "rule5Body", "rule6Title", "rule6Body", "bookingHeading", "bookingSubheading", "noticeTitle", "noticeBody",
+  "payTitle", "gcashNumber", "gcashName", "payHint", "successTitle", "successMessage", "footerHours", "footerCopyright"];
+const SOCIAL_KEYS = ["facebook", "instagram", "tiktok", "messenger", "youtube", "website", "maps"];
+const DEFAULT_PRICE_PER_HOUR = 250;
+
+async function getPricePerHour(store) {
+  const saved = await store.get("settings_text", { type: "json" });
+  const p = Number(saved && saved.text && saved.text.pricePerHour);
+  return p > 0 ? p : DEFAULT_PRICE_PER_HOUR;
+}
+
+// "YYYY-MM" in Philippine time
+function manilaMonth(iso) {
+  return new Date(Date.parse(iso) + 8 * 3600 * 1000).toISOString().slice(0, 7);
+}
 
 function corsHeaders() {
   return {
@@ -152,7 +173,7 @@ export default async function handler(req, context) {
     // POST / - customer creates booking
     if (req.method === "POST" && !action) {
       const body = await req.json();
-      const { name, phone, date, startHour, endHour, paymentData, paymentType, type: bookingType, adminPassword, addedByName } = body;
+      const { name, phone, date, startHour, endHour, paymentData, paymentType, type: bookingType, adminPassword, addedByName, txnId: rawTxnId } = body;
       if (!name || !phone || !date || startHour === undefined || endHour === undefined) {
         return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: corsHeaders() });
       }
@@ -162,6 +183,9 @@ export default async function handler(req, context) {
       }
       const isAdmin = adminPassword === ADMIN_PASSWORD;
       const id = generateId();
+      // Bookings made in one checkout share a txnId; commission is charged once per txnId.
+      const txnId = typeof rawTxnId === "string" && /^[a-z0-9]{6,40}$/i.test(rawTxnId) ? rawTxnId : id;
+      const rate = await getPricePerHour(store);
       const booking = {
         id,
         type: bookingType === "internal" ? "internal" : "customer",
@@ -177,8 +201,19 @@ export default async function handler(req, context) {
         notes: body.notes || "",
         bookedByAdmin: isAdmin,
         addedByName: isAdmin && addedByName ? String(addedByName).trim().slice(0, 80) : null,
+        txnId,
+        rate,
       };
       await store.setJSON(`booking_${id}`, booking);
+      // Commission ledger: a record the client's admin endpoints never edit or delete,
+      // so billing still sees transactions whose bookings were later deleted.
+      const ledgerKey = `ledger_${txnId}`;
+      const ledger = (await store.get(ledgerKey, { type: "json" })) || {
+        txnId, createdAt: booking.createdAt, name: booking.name, phone: booking.phone,
+        type: booking.type, bookedByAdmin: isAdmin, items: [],
+      };
+      ledger.items.push({ id, date, startHour, endHour, rate });
+      await store.setJSON(ledgerKey, ledger);
       const { paymentData: _, ...safeBooking } = booking;
       safeBooking.hasPayment = !!paymentData;
       return new Response(JSON.stringify({ booking: safeBooking }), { status: 201, headers: corsHeaders() });
@@ -272,6 +307,99 @@ export default async function handler(req, context) {
       }
       await store.setJSON("settings_images", current);
       return new Response(JSON.stringify({ images: current }), { headers: corsHeaders() });
+    }
+
+    // GET /site-text - public
+    if (req.method === "GET" && action === "site-text") {
+      const saved = (await store.get("settings_text", { type: "json" })) || {};
+      return new Response(JSON.stringify({ text: saved.text || {}, social: saved.social || {} }), { headers: corsHeaders() });
+    }
+
+    // POST /site-text - admin only. Replaces all text overrides and social links.
+    if (req.method === "POST" && action === "site-text") {
+      const body = await req.json();
+      if (body.adminPassword !== ADMIN_PASSWORD) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders() });
+      }
+      const text = {};
+      for (const key of TEXT_KEYS) {
+        const v = body.text && body.text[key];
+        if (typeof v === "string") text[key] = v.slice(0, 2000);
+      }
+      if ("pricePerHour" in text) {
+        const p = Number(text.pricePerHour);
+        if (!(p > 0 && p < 100000)) {
+          return new Response(JSON.stringify({ error: "Price per hour must be a number above 0." }), { status: 400, headers: corsHeaders() });
+        }
+        text.pricePerHour = String(p);
+      }
+      const social = {};
+      for (const key of SOCIAL_KEYS) {
+        const v = body.social && typeof body.social[key] === "string" ? body.social[key].trim() : "";
+        if (!v) continue;
+        if (!/^https?:\/\/[^\s"'<>]+$/i.test(v)) {
+          return new Response(JSON.stringify({ error: `The ${key} link must start with https://` }), { status: 400, headers: corsHeaders() });
+        }
+        social[key] = v.slice(0, 500);
+      }
+      await store.setJSON("settings_text", { text, social });
+      return new Response(JSON.stringify({ text, social }), { headers: corsHeaders() });
+    }
+
+    // POST /super-report - super admin only. Transactions made in a month (Philippine time)
+    // with their bookings, and the commission owed.
+    if (req.method === "POST" && action === "super-report") {
+      const body = await req.json();
+      if (!SUPER_ADMIN_PASSWORD) {
+        return new Response(JSON.stringify({ error: "Super admin is not set up. Add SUPER_ADMIN_PASSWORD in Netlify environment variables." }), { status: 503, headers: corsHeaders() });
+      }
+      if (body.superPassword !== SUPER_ADMIN_PASSWORD) {
+        return new Response(JSON.stringify({ error: "Invalid password" }), { status: 401, headers: corsHeaders() });
+      }
+      const month = typeof body.month === "string" && /^\d{4}-\d{2}$/.test(body.month) ? body.month : null;
+      if (!month) {
+        return new Response(JSON.stringify({ error: "Month required (YYYY-MM)" }), { status: 400, headers: corsHeaders() });
+      }
+      const allKeys = (await store.list()).blobs.map(b => b.key);
+      const bookings = (await Promise.all(allKeys.filter(k => k.startsWith("booking_")).map(k => store.get(k, { type: "json" })))).filter(Boolean);
+      const ledgers = (await Promise.all(allKeys.filter(k => k.startsWith("ledger_")).map(k => store.get(k, { type: "json" })))).filter(Boolean);
+
+      const txns = new Map();
+      const txnFor = (key, seed) => {
+        if (!txns.has(key)) txns.set(key, { txnId: key, createdAt: seed.createdAt, name: seed.name, phone: seed.phone,
+          source: seed.bookedByAdmin || seed.type === "internal" ? "admin" : "online", items: [] });
+        return txns.get(key);
+      };
+      const seen = new Set();
+      for (const b of bookings) {
+        const t = txnFor(b.txnId || b.id, b);
+        if (b.createdAt < t.createdAt) t.createdAt = b.createdAt;
+        t.items.push({ id: b.id, date: b.date, startHour: b.startHour, endHour: b.endHour,
+          rate: b.rate || DEFAULT_PRICE_PER_HOUR, status: b.status || "confirmed", paymentStatus: b.paymentStatus || null });
+        seen.add(b.id);
+      }
+      // Bookings the admin permanently deleted still appear, from the ledger.
+      for (const l of ledgers) {
+        for (const it of l.items || []) {
+          if (seen.has(it.id)) continue;
+          txnFor(l.txnId, l).items.push({ ...it, status: "deleted" });
+        }
+      }
+      const transactions = [...txns.values()]
+        .filter(t => manilaMonth(t.createdAt) === month)
+        .map(t => {
+          t.items.sort((a, b) => a.date.localeCompare(b.date) || a.startHour - b.startHour);
+          const hours = t.items.reduce((s, i) => s + (i.endHour - i.startHour), 0);
+          const amount = t.items.reduce((s, i) => s + (i.endHour - i.startHour) * i.rate, 0);
+          const billable = t.items.some(i => i.status !== "cancelled");
+          return { ...t, hours, amount, billable, commission: billable ? COMMISSION_PER_TRANSACTION : 0 };
+        })
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+      const billableCount = transactions.filter(t => t.billable).length;
+      return new Response(JSON.stringify({
+        month, commissionPerTransaction: COMMISSION_PER_TRANSACTION, transactions,
+        totals: { transactions: transactions.length, billable: billableCount, commission: billableCount * COMMISSION_PER_TRANSACTION },
+      }), { headers: corsHeaders() });
     }
 
     // GET /:id

@@ -43,6 +43,17 @@ ADMIN_PASSWORD = your_secure_password_here
 
 > The default password (if not set) is `dinkanddirt2024admin` — **change this before going live!**
 
+Optional — super admin (owner's commission report at `/super/`):
+
+```
+SUPER_ADMIN_PASSWORD = a_different_secure_password
+COMMISSION_PER_TRANSACTION = 10        # optional, defaults to 10 (PHP)
+```
+
+The super admin page is disabled until `SUPER_ADMIN_PASSWORD` is set. It lists every
+booking transaction made in a month and the commission owed (one charge per
+checkout, not per hour).
+
 ### 4. Deploy via Netlify CLI
 ```bash
 npm install -g netlify-cli

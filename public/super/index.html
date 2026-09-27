@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Super Admin – Commission Report</title>
+<link rel="icon" type="image/jpeg" href="/assets/logo-header.jpg">
+<style>
+:root{
+  --brand:#1A4E86;--brand-pale:#E6EFF9;--yellow:#F5D311;--yellow-dark:#8A7000;
+  --green:#2d6a2d;--green-pale:#e8f5e8;--red:#c44444;--red-pale:#fee;--grey-pale:#f1f1ee;
+  --bg:#f7f5f0;--card:#fff;--text:#1a1a1a;--muted:#666;--border:#ddd;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--brand);padding:16px}
+.login-box{background:#fff;border-radius:14px;padding:32px 28px;width:100%;max-width:360px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.login-box h1{font-size:1.35rem;color:var(--brand);margin:8px 0 4px}
+.login-box p{color:var(--muted);font-size:.82rem;margin-bottom:18px}
+.login-box input{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;margin-bottom:10px}
+.login-box input:focus{outline:none;border-color:var(--brand)}
+.btn{padding:10px 16px;border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;background:var(--brand);color:#fff}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.secondary{background:#fff;color:var(--brand);border:1.5px solid var(--brand)}
+.btn.full{width:100%}
+.err{background:var(--red-pale);color:var(--red);border:1px solid #fcc;border-radius:8px;padding:9px 12px;font-size:.8rem;margin-bottom:10px;display:none;text-align:left}
+.app{display:none;max-width:1200px;margin:0 auto;padding:20px 16px 40px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.top img{width:44px;height:44px;border-radius:50%;background:#fff;object-fit:contain;border:2px solid var(--yellow)}
+.top h1{font-size:1.25rem;color:var(--brand);flex:1;min-width:200px}
+.top h1 small{display:block;font-size:.75rem;color:var(--muted);font-weight:500}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.controls input[type=month]{padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.stat .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600}
+.stat .val{font-size:1.6rem;font-weight:700;color:var(--brand);margin-top:4px}
+.stat.hl{background:var(--brand);color:#fff}
+.stat.hl .lbl{color:rgba(255,255,255,.75)}
+.stat.hl .val{color:var(--yellow)}
+.card{background:var(--card);border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);overflow:hidden}
+.note{font-size:.76rem;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--border);line-height:1.5}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{background:var(--grey-pale);text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--border)}
+td{padding:9px 10px;border-bottom:1px solid #eee;vertical-align:top;font-size:.82rem}
+tr.waived td{opacity:.5}
+td.num,th.num{text-align:right;white-space:nowrap}
+.sched{white-space:nowrap;line-height:1.55}
+.badge{display:inline-block;font-size:.68rem;font-weight:600;border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0}
+.b-online{background:var(--brand-pale);color:var(--brand)}
+.b-admin{background:#fff9e0;color:var(--yellow-dark)}
+.b-confirmed{background:var(--green-pale);color:var(--green)}
+.b-on_hold{background:#fff9e0;color:var(--yellow-dark)}
+.b-cancelled{background:var(--grey-pale);color:var(--muted)}
+.b-deleted{background:var(--red-pale);color:var(--red)}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+.muted{color:var(--muted);font-size:.74rem}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand);cursor:pointer}
+.print-only{display:none}
+@media print{
+  body{background:#fff}
+  .no-print,.controls,.note .no-print{display:none!important}
+  .print-only{display:block}
+  .app{padding:0;max-width:none}
+  .card,.stat{box-shadow:none;border:1px solid #ccc}
+  tr.waived{display:none}
+  table{min-width:0}
+}
+</style>
+</head>
+<body>
+
+<div class="login" id="loginScreen">
+  <div class="login-box">
+    <div style="font-size:2rem">🔐</div>
+    <h1>Super Admin</h1>
+    <p>Monthly bookings &amp; commission report</p>
+    <div class="err" id="loginErr"></div>
+    <input type="password" id="pass" placeholder="Super admin password" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn full" id="loginBtn" onclick="login()">Log in</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="top">
+    <img src="/assets/logo-header.jpg" alt="">
+    <h1>Commission Report <small id="subtitle">Dink &amp; Dirt Pickleball</small></h1>
+    <div class="controls">
+      <button class="btn secondary" onclick="shiftMonth(-1)" aria-label="Previous month">‹</button>
+      <input type="month" id="month" onchange="loadReport()">
+      <button class="btn secondary" onclick="shiftMonth(1)" aria-label="Next month">›</button>
+      <button class="btn secondary" onclick="exportCsv()">⬇ CSV</button>
+      <button class="btn" onclick="window.print()">🖨 Print Statement</button>
+    </div>
+  </div>
+
+  <div class="print-only" style="margin-bottom:12px">
+    <h2 id="printTitle" style="font-size:1.2rem"></h2>
+    <div class="muted" id="printSub"></div>
+  </div>
+
+  <div class="err" id="reportErr"></div>
+
+  <div class="stats">
+    <div class="stat"><div class="lbl">Transactions</div><div class="val" id="sTxns">–</div></div>
+    <div class="stat"><div class="lbl">Billed</div><div class="val" id="sBilled">–</div></div>
+    <div class="stat"><div class="lbl">Not billed</div><div class="val" id="sWaived">–</div></div>
+    <div class="stat"><div class="lbl">Court sales (billed)</div><div class="val" id="sSales">–</div></div>
+    <div class="stat hl"><div class="lbl">Commission due</div><div class="val" id="sCommission">–</div></div>
+  </div>
+
+  <div class="card">
+    <div class="note">
+      <strong id="rateNote">₱10 per transaction</strong> — one customer checkout counts once, however many hours or dates it covers.
+      Month is based on <strong>when the booking was made</strong> (Philippine time). Transactions where every booking was cancelled are not billed.
+      Bookings the admin permanently deleted are still listed (marked <span class="badge b-deleted">deleted</span>).
+      <span class="no-print">Untick <strong>Bill</strong> to leave a transaction off this statement (not saved — for printing/export only).</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th class="no-print">Bill</th><th>Booked on</th><th>Customer</th><th>Source</th><th>Schedule</th>
+          <th class="num">Hours</th><th class="num">Court amount</th><th class="num">Commission</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='/api/bookings';
+let pass='';
+let report=null;
+let waived=new Set(); // txnIds unticked in this view
+
+const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH');
+const fmtHour=h=>{const hr=Math.floor(h),p=hr<12||hr===24?'AM':'PM',d=hr%12===0?12:hr%12;return `${d}${p}`;};
+const fmtDate=s=>{const[y,m,d]=s.split('-');return new Date(y,m-1,d).toLocaleDateString('en-PH',{month:'short',day:'numeric'});};
+const fmtCreated=iso=>new Date(iso).toLocaleString('en-PH',{timeZone:'Asia/Manila',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function manilaMonthNow(){return new Date(Date.now()+8*3600e3).toISOString().slice(0,7);}
+
+async function login(){
+  const p=document.getElementById('pass').value;
+  const err=document.getElementById('loginErr');err.style.display='none';
+  if(!p)return;
+  const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Checking…';
+  const res=await fetchReport(p,manilaMonthNow());
+  btn.disabled=false;btn.textContent='Log in';
+  if(!res.ok){err.textContent=res.error;err.style.display='block';return;}
+  pass=p;
+  try{sessionStorage.setItem('dd_super',p);}catch(e){}
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('month').value=manilaMonthNow();
+  showReport(res.data);
+}
+
+async function fetchReport(p,month){
+  try{
+    const r=await fetch(`${API}/super-report`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({superPassword:p,month})});
+    const d=await r.json();
+    if(!r.ok)return{ok:false,error:r.status===401?'Wrong password.':(d.error||'Could not load report.')};
+    return{ok:true,data:d};
+  }catch(e){return{ok:false,error:'Network error. Please try again.'};}
+}
+
+async function loadReport(){
+  const month=document.getElementById('month').value;
+  const err=document.getElementById('reportErr');err.style.display='none';
+  if(!month)return;
+  document.getElementById('rows').innerHTML='<tr><td colspan="8" class="empty">Loading…</td></tr>';
+  const res=await fetchReport(pass,month);
+  if(!res.ok){err.textContent=res.error;err.style.display='block';document.getElementById('rows').innerHTML='';return;}
+  showReport(res.data);
+}
+
+function shiftMonth(d){
+  const el=document.getElementById('month');
+  const[y,m]=el.value.split('-').map(Number);
+  const dt=new Date(y,m-1+d,1);
+  el.value=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+  loadReport();
+}
+
+function isBilled(t){return t.billable&&!waived.has(t.txnId);}
+
+function showReport(d){
+  report=d;waived=new Set();
+  document.getElementById('rateNote').textContent=`${peso(d.commissionPerTransaction)} per transaction`;
+  const[y,m]=d.month.split('-');
+  const label=new Date(y,m-1,1).toLocaleDateString('en-PH',{month:'long',year:'numeric'});
+  document.getElementById('printTitle').textContent=`Commission Statement — ${label}`;
+  document.getElementById('printSub').textContent=`Dink & Dirt Pickleball · ${peso(d.commissionPerTransaction)} per booking transaction · Generated ${new Date().toLocaleDateString('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium'})}`;
+  renderRows();
+}
+
+function renderRows(){
+  const tb=document.getElementById('rows');
+  const list=report.transactions;
+  if(!list.length){tb.innerHTML='<tr><td colspan="8" class="empty">No bookings made this month.</td></tr>';updateTotals();return;}
+  tb.innerHTML=list.map(t=>{
+    const billed=isBilled(t);
+    const sched=t.items.map(i=>`${fmtDate(i.date)} · ${fmtHour(i.startHour)}–${fmtHour(i.endHour)}${i.status!=='confirmed'?` <span class="badge b-${esc(i.status)}">${esc(i.status.replace('_',' '))}</span>`:''}`).join('<br>');
+    const src=t.source==='admin'?'<span class="badge b-admin">Added by admin</span>':'<span class="badge b-online">Online</span>';
+    const box=t.billable
+      ?`<input type="checkbox" ${billed?'checked':''} onchange="toggleBill('${esc(t.txnId)}',this.checked)" aria-label="Bill this transaction">`
+      :'<span class="muted" title="All bookings cancelled">—</span>';
+    return `<tr class="${billed?'':'waived'}">
+      <td class="no-print">${box}</td>
+      <td style="white-space:nowrap">${esc(fmtCreated(t.createdAt))}</td>
+      <td>${esc(t.name)}<div class="muted">${esc(t.phone)}</div></td>
+      <td>${src}</td>
+      <td class="sched">${sched}</td>
+      <td class="num">${t.hours}</td>
+      <td class="num">${peso(t.amount)}</td>
+      <td class="num"><strong>${billed?peso(report.commissionPerTransaction):'—'}</strong></td>
+    </tr>`;
+  }).join('')+`<tr><td class="no-print"></td><td colspan="4"><strong>Total</strong></td><td class="num" id="tHours"></td><td class="num" id="tSales"></td><td class="num"><strong id="tComm"></strong></td></tr>`;
+  updateTotals();
+}
+
+function toggleBill(id,on){if(on)waived.delete(id);else waived.add(id);renderRows();}
+
+function updateTotals(){
+  const list=report?report.transactions:[];
+  const billed=list.filter(isBilled);
+  const comm=billed.length*(report?report.commissionPerTransaction:0);
+  const sales=billed.reduce((s,t)=>s+t.amount,0);
+  document.getElementById('sTxns').textContent=list.length;
+  document.getElementById('sBilled').textContent=billed.length;
+  document.getElementById('sWaived').textContent=list.length-billed.length;
+  document.getElementById('sSales').textContent=peso(sales);
+  document.getElementById('sCommission').textContent=peso(comm);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('tHours',billed.reduce((s,t)=>s+t.hours,0));
+  set('tSales',peso(sales));
+  set('tComm',peso(comm));
+}
+
+function exportCsv(){
+  if(!report)return;
+  const q=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const rows=[['Transaction ID','Booked on (PH time)','Customer','Phone','Source','Schedule','Hours','Court amount','Billed','Commission']];
+  report.transactions.forEach(t=>{
+    const billed=isBilled(t);
+    rows.push([t.txnId,fmtCreated(t.createdAt),t.name,t.phone,t.source==='admin'?'Added by admin':'Online',
+      t.items.map(i=>`${i.date} ${fmtHour(i.startHour)}-${fmtHour(i.endHour)}${i.status!=='confirmed'?' ('+i.status+')':''}`).join('; '),
+      t.hours,t.amount,billed?'Yes':'No',billed?report.commissionPerTransaction:0]);
+  });
+  const billed=report.transactions.filter(isBilled);
+  rows.push([],['','','','','','Total billed',billed.reduce((s,t)=>s+t.hours,0),billed.reduce((s,t)=>s+t.amount,0),billed.length,billed.length*report.commissionPerTransaction]);
+  const blob=new Blob([rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`dinkanddirt-commission-${report.month}.csv`;a.click();
+}
+
+// Stay logged in on refresh (this browser tab only)
+(async()=>{
+  let p=null;try{p=sessionStorage.getItem('dd_super');}catch(e){}
+  if(p){document.getElementById('pass').value=p;login();}
+})();
+</script>
+</body>
+</html>

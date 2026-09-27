@@ -312,6 +312,7 @@ tr:hover td{background:#fafaf7;}
       <div class="nav-item" onclick="showPage('notifications')">🔔 Notifications <span id="notifBadge" style="display:none;background:#F5D311;color:#1a1a1a;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:700;margin-left:4px"></span></div>
       <div class="nav-item" onclick="showPage('hero')">🖼 Hero & Carousel</div>
       <div class="nav-item" onclick="showPage('images')">🎨 Site Images</div>
+      <div class="nav-item" onclick="showPage('text')">✏️ Site Text</div>
       <div class="nav-item" onclick="showPage('banner')">📢 Promo Banner</div>
       <div class="nav-item" onclick="showPage('settings')">⚙️ Settings</div>
       <div class="nav-item" onclick="showPage('export')">📤 Export</div>
@@ -609,6 +610,22 @@ tr:hover td{background:#fafaf7;}
       </div>
     </div>
 
+    <!-- SITE TEXT -->
+    <div class="page" id="page-text">
+      <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.06);max-width:760px">
+        <h3 style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--green);margin-bottom:6px">✏️ Site Text &amp; Social Links</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:6px">Edit the words shown on your booking site. Changes appear on the site after you save.</p>
+        <p style="color:var(--muted);font-size:0.78rem;margin-bottom:18px">Tip: type <code>{phone}</code> or <code>{price}</code> anywhere to insert your phone number or hourly price.</p>
+        <div id="textError" class="error-banner" style="display:none"></div>
+        <div id="textSuccess" class="success-banner" style="display:none"></div>
+        <div id="siteTextForm"></div>
+        <div style="position:sticky;bottom:0;background:white;padding:14px 0 4px;margin-top:10px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-primary" onclick="saveSiteText()">💾 Save Changes</button>
+          <button class="btn-secondary" onclick="loadSiteText()">↩ Discard Changes</button>
+        </div>
+      </div>
+    </div>
+
     <!-- SITE IMAGES -->
     <div class="page" id="page-images">
       <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.06);max-width:760px">
@@ -842,6 +859,7 @@ tr:hover td{background:#fafaf7;}
   </div>
 </div>
 
+<script src="/site-content.js"></script>
 <script>
 const API='/api/bookings';
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -852,6 +870,7 @@ const ADMIN_OPEN_HOUR=0;
 const ADMIN_CLOSE_HOUR=24;
 
 let adminPass='';
+let PRICE_PER_HOUR=250; // replaced by the price saved in Site Text after login
 let allBookings=[];
 let filteredBookings=[];
 let adminViewYear,adminViewMonth;
@@ -916,6 +935,7 @@ async function doLogin(){
 
     // Success
     adminPass=pass;
+    await loadPricePerHour();
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('adminApp').classList.add('visible');
     initAdmin();
@@ -980,11 +1000,11 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
-  const labels={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',images:'Site Images',banner:'Promo Banner'};
+  const labels={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',images:'Site Images',text:'Site Text',banner:'Promo Banner'};
   document.getElementById('pageTitle').textContent=labels[name]||name;
   currentPage=name;
 
-  const navMap={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',images:'Site Images',banner:'Promo Banner'};
+  const navMap={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',images:'Site Images',text:'Site Text',banner:'Promo Banner'};
   document.querySelectorAll('.nav-item').forEach(n=>{
     if(navMap[name]&&n.textContent.includes(navMap[name]))n.classList.add('active');
   });
@@ -1000,6 +1020,7 @@ function showPage(name){
   if(name==='settings')loadAdminSettings();
   if(name==='hero')loadHeroSettings();
   if(name==='images')loadSiteImages();
+  if(name==='text')loadSiteText();
   if(name==='banner')loadBanner();
 }
 
@@ -1311,7 +1332,7 @@ function renderBookings(bookings,tableId,mobileId,isToday=false){
   let html=`<table><thead><tr><th>Type</th><th>Date</th><th>Time</th><th>Hrs</th><th>Amount</th><th>Name</th><th>Phone</th><th>Status</th><th>Payment</th><th>Actions</th></tr></thead><tbody>`;
   bookings.forEach(b=>{
     const hrs=b.endHour-b.startHour;
-    const amount=b.type==='block'?'—':`₱${(hrs*250).toLocaleString()}`;
+    const amount=b.type==='block'?'—':`₱${(hrs*(b.rate||PRICE_PER_HOUR)).toLocaleString()}`;
     const statusBadge=getStatusBadgeShort(b);
     const payBadge=getPaymentBadge(b);
     const canView=b.type!=='block';
@@ -1349,7 +1370,7 @@ function renderBookings(bookings,tableId,mobileId,isToday=false){
   let mob='';
   bookings.forEach(b=>{
     const hrs=b.endHour-b.startHour;
-    const amount=b.type==='block'?'—':`₱${(hrs*250).toLocaleString()}`;
+    const amount=b.type==='block'?'—':`₱${(hrs*(b.rate||PRICE_PER_HOUR)).toLocaleString()}`;
     const statusBadge=getStatusBadge(b);
     const payBadge=getPaymentBadge(b);
     const canView=b.type!=='block';
@@ -1396,9 +1417,9 @@ async function viewBooking(id){
     ['Date',formatDate(booking.date)],
     ['Time',`${formatHour(booking.startHour)} – ${formatHour(booking.endHour)}`],
     ['Duration',`${booking.endHour-booking.startHour}h`],
-    ...(booking.type!=='block'?[['Court Fee',`₱${((booking.endHour-booking.startHour)*250).toLocaleString()}`]]:[]),
+    ...(booking.type!=='block'?[['Court Fee',`₱${((booking.endHour-booking.startHour)*(booking.rate||PRICE_PER_HOUR)).toLocaleString()}`]]:[]),
     ...(booking.paddleQty>0?[['Paddle Rental',`${booking.paddleQty} × ₱50 = ₱${booking.paddleQty*50}`]]:[]),
-    ...(booking.type!=='block'&&booking.paddleQty>0?[['Total Amount Due',`₱${((booking.endHour-booking.startHour)*250+booking.paddleQty*50).toLocaleString()}`]]:[]),
+    ...(booking.type!=='block'&&booking.paddleQty>0?[['Total Amount Due',`₱${((booking.endHour-booking.startHour)*(booking.rate||PRICE_PER_HOUR)+booking.paddleQty*50).toLocaleString()}`]]:[]),
     ...(booking.bookedByAdmin?[['Added By',`🛠 ${escapeHtml(booking.addedByName||'Admin')} (manual entry)`]]:[]),
     ['Booking Status',booking.status==='on_hold'?'⏸ On Hold':booking.status==='confirmed'?'✓ Confirmed':'✗ Cancelled'],
     ...(booking.holdReason?[['Hold Reason',`⏸ ${booking.holdReason}`]]:[]),
@@ -1839,8 +1860,9 @@ async function submitAdminBooking(){
   const addPayStatus=type==='internal'?document.getElementById('addPaymentStatus').value||null:null;
 
   const added=[];
+  const txnId=Date.now().toString(36)+Math.random().toString(36).slice(2,10); // one transaction for all rows
   for(const row of addDayRows){
-    const payload={name,phone,date:row.date,startHour:row.start,endHour:row.end,notes,type,adminPassword:adminPass,addedByName:staffName};
+    const payload={txnId,name,phone,date:row.date,startHour:row.start,endHour:row.end,notes,type,adminPassword:adminPass,addedByName:staffName};
     if(type==='internal'){
       payload.paymentType=addPayType;
       payload.paymentStatus=addPayStatus;
@@ -2309,6 +2331,85 @@ function clearBanner(){
   document.getElementById('bannerPreviewWrap').style.display='none';
   document.getElementById('bannerUploadContent').innerHTML='<div style="font-size:1.5rem;margin-bottom:6px">🖼️</div><div style="font-size:0.82rem;color:var(--muted)">Click to upload banner image<br><span style="font-size:0.72rem">Recommended: 1200×300px or wider</span></div>';
   document.getElementById('bannerFileInput').value='';
+}
+
+// ─── Site Text & Social Links ───────────────────────────────
+async function loadPricePerHour(){
+  try{
+    const d=await (await fetch(`${API}/site-text`)).json();
+    const p=Number(d.text&&d.text.pricePerHour);
+    if(p>0)PRICE_PER_HOUR=p;
+  }catch(e){}
+}
+
+async function loadSiteText(){
+  const C=window.SITE_CONTENT;
+  const errEl=document.getElementById('textError');
+  errEl.style.display='none';document.getElementById('textSuccess').style.display='none';
+  let saved={text:{},social:{}};
+  try{saved=await (await fetch(`${API}/site-text`)).json();}
+  catch(e){errEl.textContent='Failed to load saved text.';errEl.style.display='block';}
+  const form=document.getElementById('siteTextForm');
+  form.innerHTML='';
+  const section=(title)=>{
+    const h=document.createElement('div');
+    h.style.cssText="font-family:'Bebas Neue',cursive;font-size:1.05rem;letter-spacing:1px;color:var(--green);margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border)";
+    h.textContent=title;form.appendChild(h);
+  };
+  const field=(id,label,value,opts={})=>{
+    const g=document.createElement('div');g.className='form-group';
+    const l=document.createElement('label');l.textContent=label;l.htmlFor=id;
+    const el=document.createElement(opts.long?'textarea':'input');
+    el.id=id;el.value=value;
+    if(opts.long)el.rows=2;
+    if(opts.type)el.type=opts.type;
+    if(opts.placeholder)el.placeholder=opts.placeholder;
+    el.style.width='100%';
+    g.append(l,el);
+    if(opts.hint){const h=document.createElement('div');h.style.cssText='font-size:0.72rem;color:var(--muted);margin-top:3px';h.textContent=opts.hint;g.appendChild(h);}
+    form.appendChild(g);
+  };
+  C.groups.forEach(grp=>{
+    section(grp.title);
+    grp.fields.forEach(f=>{
+      const v=(saved.text&&f.key in saved.text)?saved.text[f.key]:f.def;
+      field('st_'+f.key,f.label,v,{long:f.long,type:f.type,hint:f.hint,placeholder:f.def});
+    });
+  });
+  section('Social Links (footer)');
+  const note=document.createElement('p');
+  note.style.cssText='font-size:0.75rem;color:var(--muted);margin-bottom:8px';
+  note.textContent='Paste the full link (starting with https://). Leave blank to hide.';
+  form.appendChild(note);
+  C.social.forEach(x=>field('ss_'+x.key,x.label,(saved.social&&saved.social[x.key])||'',{type:'url',placeholder:'https://'}));
+}
+
+async function saveSiteText(){
+  const C=window.SITE_CONTENT;
+  const errEl=document.getElementById('textError');
+  const sucEl=document.getElementById('textSuccess');
+  errEl.style.display='none';sucEl.style.display='none';
+  const text={},social={};
+  C.groups.forEach(g=>g.fields.forEach(f=>{
+    const v=document.getElementById('st_'+f.key).value;
+    if(v!==f.def)text[f.key]=v; // only store what differs from the default
+  }));
+  for(const x of C.social){
+    const v=document.getElementById('ss_'+x.key).value.trim();
+    if(!v)continue;
+    if(!C.isSafeUrl(v)){errEl.textContent=`The ${x.label} link must start with https://`;errEl.style.display='block';errEl.scrollIntoView({block:'nearest'});return;}
+    social[x.key]=v;
+  }
+  if('pricePerHour' in text&&!(Number(text.pricePerHour)>0)){errEl.textContent='Court price per hour must be a number above 0.';errEl.style.display='block';errEl.scrollIntoView({block:'nearest'});return;}
+  try{
+    const r=await fetch(`${API}/site-text`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass,text,social})});
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Save failed.';errEl.style.display='block';return;}
+    const p=Number(d.text&&d.text.pricePerHour);PRICE_PER_HOUR=p>0?p:250;
+    sucEl.textContent='Saved! The booking site will show the new text on next load.';
+    sucEl.style.display='block';sucEl.scrollIntoView({block:'nearest'});
+    setTimeout(()=>{sucEl.style.display='none';},4000);
+  }catch(e){errEl.textContent='Network error.';errEl.style.display='block';}
 }
 
 // ─── Site Images (logo, background, QR, icon) ───────────────
