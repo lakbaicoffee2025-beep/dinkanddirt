@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dink &amp; Dirt Pickleball – Book a Court</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="/assets/carousel-1.jpg" as="image">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --navy:   #08121E;
+  --navy2:  #0D1C2E;
+  --navy3:  #122440;
+  --navy4:  #1A3050;
+  --gold:   #C9A227;
+  --gold2:  #E8C44A;
+  --gold3:  rgba(201,162,39,0.18);
+  --teal:   #0D3248;
+  --green-available: #1A3A28;
+  --green-border:    #2A6040;
+  --red:    #c44444;
+  --text:   #FFFFFF;
+  --text2:  rgba(255,255,255,0.6);
+  --text3:  rgba(255,255,255,0.35);
+  --border: rgba(255,255,255,0.1);
+  --border2: rgba(255,255,255,0.06);
+  --bamboo: #C4923A;
+  --bamboo-pale: rgba(196,146,58,0.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+img { max-width: 100%; display: block; }
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  height: 100dvh;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--navy);
+  z-index: 0;
+}
+.carousel-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  transition: transform .5s ease;
+  z-index: 0;
+}
+.carousel-slide {
+  flex: 0 0 100%;
+  height: 100%;
+}
+.carousel-slide img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: .45;
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(8,18,30,.65) 0%, rgba(8,18,30,.5) 50%, rgba(8,18,30,.85) 100%);
+  z-index: 1;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.hero-logo-badge {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: rgba(8,18,30,.8);
+  border: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(201,162,39,.25), 0 4px 24px rgba(0,0,0,.5);
+}
+.hero-logo-badge img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.hero-logo-badge-fallback {
+  font-size: 2.4rem;
+}
+.hero-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: clamp(3.2rem, 10vw, 7rem);
+  letter-spacing: 4px;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 24px rgba(0,0,0,.6);
+}
+.hero-sub1 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(.7rem, 1.5vw, .9rem);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+.hero-sub2 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  letter-spacing: .2em;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+.hero-divider {
+  width: 60px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 0 auto 28px;
+}
+.hero-cta-icon {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(201,162,39,.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all .2s;
+  animation: pulse 2.5s infinite;
+}
+.hero-cta-icon:hover {
+  border-color: var(--gold);
+  background: rgba(201,162,39,.12);
+  transform: scale(1.05);
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,162,39,.25); }
+  50% { box-shadow: 0 0 0 14px rgba(201,162,39,0); }
+}
+.hero-cta-text {
+  font-family: 'Bebas Neue', cursive;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  letter-spacing: .2em;
+  color: var(--gold);
+  cursor: pointer;
+  transition: color .2s;
+  margin-bottom: 8px;
+}
+.hero-cta-text:hover { color: var(--gold2); }
+.hero-cta-sub {
+  font-size: .82rem;
+  color: var(--text2);
+  margin-bottom: 24px;
+}
+.hero-location {
+  font-size: .72rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.carousel-btn {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  background: rgba(8,18,30,.5);
+  color: rgba(255,255,255,.6);
+  border: 1px solid var(--border);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+  transition: all .2s;
+}
+.carousel-btn:hover { background: rgba(201,162,39,.3); border-color: var(--gold); }
+.carousel-btn.prev { left: 16px; }
+.carousel-btn.next { right: 16px; }
+.carousel-dots {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 10;
+}
+.carousel-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,.3); cursor: pointer; transition: all .2s;
+}
+.carousel-dot.active { background: var(--gold); width: 20px; border-radius: 4px; }
+
+/* ── RULES MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--navy2);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 64px rgba(0,0,0,.6);
+}
+.modal-head {
+  padding: 22px 22px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head h2 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.modal-head p { font-size: .8rem; color: var(--text2); }
+.modal-body { padding: 16px 22px; overflow-y: auto; flex: 1; }
+.modal-body::-webkit-scrollbar { width: 4px; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.rule-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--navy3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 13px 14px;
+  margin-bottom: 8px;
+}
+.rule-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--gold3);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: .75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.rule-title { font-size: .88rem; font-weight: 600; color: #fff; margin-bottom: 3px; }
+.rule-body { font-size: .78rem; color: var(--text2); line-height: 1.55; }
+.modal-foot {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 10px;
+}
+.btn-cancel {
+  flex: 1; padding: 13px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  transition: all .2s;
+}
+.btn-cancel:hover { border-color: rgba(255,255,255,.3); color: #fff; }
+.btn-agree {
+  flex: 1.5; padding: 13px;
+  background: var(--gold);
+  border: none;
+  color: var(--navy);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 600;
+  transition: background .2s;
+}
+.btn-agree:hover { background: var(--gold2); }
+
+/* ── BOOKING SECTION ── */
+#bookingSection {
+  display: none;
+  min-height: 100vh;
+}
+#bookingSection.visible { display: block; }
+
+/* TOPBAR */
+.topbar {
+  background: var(--navy);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.topbar-logo img {
+  height: 34px; width: 34px;
+  border-radius: 50%; object-fit: cover;
+  border: 1px solid var(--gold);
+}
+.topbar-logo-text .tl-name {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  color: #fff;
+  line-height: 1;
+}
+.topbar-logo-text .tl-loc {
+  font-size: .65rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 1px;
+}
+.topbar-tagline {
+  font-family: 'Bebas Neue', cursive;
+  font-size: .85rem;
+  letter-spacing: .2em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+.topbar-contact a {
+  font-size: .75rem;
+  color: var(--text2);
+  text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+  transition: color .2s;
+}
+.topbar-contact a:hover { color: var(--gold); }
+
+/* BOOKING MAIN */
+.bk-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+.bk-heading {
+  margin-bottom: 20px;
+}
+.bk-heading h1 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  letter-spacing: 3px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.bk-heading p { font-size: .83rem; color: var(--text2); }
+
+/* STEPS */
+.steps {
+  display: flex; gap: 2px;
+  margin-bottom: 22px;
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.step {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  font-size: .76rem; color: var(--text3);
+  transition: all .3s;
+}
+.step.active { background: var(--navy3); color: #fff; }
+.step-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .68rem; font-weight: 700; flex-shrink: 0;
+}
+.step.active .step-num { background: var(--gold3); color: var(--gold); }
+
+/* DATE NAV */
+.date-nav {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.date-nav-left { font-size: .78rem; color: var(--text2); }
+.date-nav-left strong { display: block; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
+.date-nav-right { display: flex; align-items: center; gap: 6px; }
+.date-nav-btn {
+  width: 32px; height: 32px;
+  background: var(--navy3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: .95rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.date-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.date-nav-today {
+  padding: 6px 14px;
+  background: var(--gold3);
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: background .15s;
+}
+.date-nav-today:hover { background: rgba(201,162,39,.28); }
+
+/* LAYOUT */
+.bk-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+
+/* CALENDAR PANEL */
+.panel {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.panel-hd {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Bebas Neue', cursive;
+  font-size: .95rem;
+  letter-spacing: 2px;
+  color: var(--text);
+  display: flex; align-items: center; gap: 7px;
+}
+.panel-bd { padding: 14px; }
+
+.cal-nav-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cal-nav-btn {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border);
+  background: var(--navy3);
+  border-radius: 6px;
+  cursor: pointer; font-size: .9rem;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2);
+  transition: all .15s;
+}
+.cal-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.cal-month-label {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.15rem;
+  letter-spacing: 1.5px;
+  color: #fff;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: 2px;
+}
+.cal-dow {
+  text-align: center;
+  font-size: .6rem; font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: 4px 0;
+}
+.cal-day {
+  aspect-ratio: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  border-radius: 6px;
+  font-size: .78rem;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all .15s;
+  position: relative; gap: 2px;
+}
+.cal-day:hover:not(.empty):not(.past) { background: var(--navy4); color: #fff; }
+.cal-day.empty { cursor: default; }
+.cal-day.past { opacity: .25; cursor: default; }
+.cal-day.today { border: 1px solid var(--gold); color: #fff; font-weight: 700; }
+.cal-day.selected { background: var(--gold3); border: 1px solid var(--gold); color: var(--gold); font-weight: 700; }
+.cal-day.has-bookings .dot { width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
+.cal-day.selected .dot { background: var(--gold); }
+.cal-day.full-day .dot { background: #c44; }
+
+/* SLOTS */
+.avail-badge {
+  display: inline-flex; align-items: center;
+  background: #2A4A1E; border: 1px solid #3A7A2E;
+  color: #7ACA50; font-size: .72rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  margin-bottom: 10px;
+  letter-spacing: .04em;
+}
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.time-grid::-webkit-scrollbar { width: 4px; }
+.time-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.time-slot {
+  padding: 10px 12px;
+  background: var(--navy3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+}
+.time-slot:hover:not(.taken):not(.selected) { border-color: var(--gold); background: var(--gold3); }
+.time-slot.selected { background: var(--navy4); border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.time-slot.taken { opacity: .45; cursor: not-allowed; }
+.time-slot.taken .ts-label { color: var(--text3); }
+.time-slot.taken .ts-price { color: var(--text3); font-size: .68rem; letter-spacing: .08em; }
+.ts-label { font-size: .78rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
+.ts-price { font-size: .75rem; color: var(--gold); font-weight: 500; }
+.ts-taken-label { font-size: .65rem; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; }
+
+.no-date-msg { text-align: center; color: var(--text2); padding: 36px 14px; font-size: .83rem; }
+.no-date-msg .big { font-size: 1.8rem; margin-bottom: 8px; }
+.date-slot-panel { margin-bottom: 12px; }
+
+/* FORM PANEL */
+.bk-summary {
+  background: var(--navy3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: .8rem;
+}
+.sum-row { display: flex; justify-content: space-between; padding: 3px 0; }
+.sum-row span:first-child { color: var(--text2); }
+.sum-row span:last-child { font-weight: 600; color: #fff; }
+.sum-row.total span { color: var(--gold); font-family: 'Bebas Neue', cursive; font-size: .95rem; letter-spacing: 1px; }
+.sum-empty { text-align: center; color: var(--text3); font-size: .78rem; padding: 6px 0; }
+
+.fg { margin-bottom: 12px; }
+.fg label {
+  display: block; font-size: .68rem; font-weight: 600;
+  color: var(--text3); text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 5px;
+}
+.fg input, .fg textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--navy3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  transition: border .2s;
+}
+.fg input::placeholder, .fg textarea::placeholder { color: var(--text3); }
+.fg input:focus, .fg textarea:focus { outline: none; border-color: var(--gold); }
+.fg textarea { resize: vertical; }
+
+.pay-box {
+  background: var(--navy3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.pay-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.1rem; letter-spacing: 1.5px; color: #fff;
+  margin-bottom: 10px;
+}
+.pay-number-box {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 6px;
+}
+.pay-lbl { display: block; font-size: .62rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 4px; }
+.pay-val {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.35rem; letter-spacing: 3px; color: var(--gold);
+  text-decoration: none; display: block;
+  transition: color .2s;
+}
+.pay-val:hover { color: var(--gold2); }
+.pay-name { font-size: .72rem; color: var(--text2); margin-bottom: 10px; }
+.pay-divider {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3);
+  margin: 8px 0;
+}
+.pay-divider::before, .pay-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.pay-qr {
+  max-width: 200px; width: 100%;
+  display: block; margin: 0 auto 10px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+}
+.pay-hint { font-size: .72rem; color: var(--text2); line-height: 1.5; }
+
+.upload-area {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+}
+.upload-area:hover, .upload-area.has-file { border-color: var(--gold); background: var(--gold3); }
+.upload-area input { display: none; }
+.upload-icon { font-size: 1.6rem; margin-bottom: 5px; }
+.upload-text { font-size: .74rem; color: var(--text2); }
+.upload-area.has-file .upload-text { color: var(--gold); font-weight: 600; }
+.upload-preview { max-width: 100%; max-height: 90px; border-radius: 6px; margin: 7px auto 0; border: 1px solid var(--border); }
+
+.outdoor-notice {
+  background: rgba(245,158,11,.08);
+  border-left: 3px solid #f59e0b;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: .78rem;
+  color: rgba(245,158,11,.85);
+  line-height: 1.5;
+}
+.outdoor-notice strong { display: block; font-size: .8rem; margin-bottom: 2px; color: #f59e0b; }
+
+.error-msg {
+  background: rgba(196,68,68,.15);
+  border: 1px solid rgba(196,68,68,.4);
+  color: #f87171;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: .78rem;
+  margin-bottom: 12px;
+}
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--gold);
+  border: none;
+  border-radius: 10px;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.1rem;
+  letter-spacing: 2.5px;
+  color: var(--navy);
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-submit:hover { background: var(--gold2); transform: translateY(-1px); }
+.btn-submit:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(8,18,30,.3); border-top-color: var(--navy); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* SUCCESS */
+.success-screen { display: none; text-align: center; padding: 48px 16px; }
+.success-screen.visible { display: block; }
+.success-icon { font-size: 3.5rem; margin-bottom: 14px; }
+.success-screen h2 { font-family: 'Bebas Neue', cursive; font-size: 2rem; letter-spacing: 3px; color: #fff; margin-bottom: 6px; }
+.success-screen p { color: var(--text2); font-size: .85rem; margin-bottom: 4px; }
+.bk-card {
+  background: var(--navy2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 340px;
+  text-align: left;
+}
+.bk-card h3 { font-family: 'Bebas Neue', cursive; font-size: 1rem; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 10px; }
+.bc-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border2); font-size: .83rem; }
+.bc-row:last-child { border-bottom: none; }
+.bc-row span:first-child { color: var(--text2); }
+.btn-new {
+  margin-top: 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: 'Bebas Neue', cursive;
+  font-size: .95rem;
+  letter-spacing: 2px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-new:hover { border-color: var(--gold); color: var(--gold); }
+
+/* FOOTER */
+footer {
+  background: var(--navy2);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 18px 16px;
+  font-size: .72rem;
+  color: var(--text3);
+  line-height: 1.8;
+}
+footer a { color: var(--text2); text-decoration: none; }
+footer a:hover { color: var(--gold); }
+
+.admin-link {
+  position: fixed; bottom: 14px; right: 14px;
+  background: rgba(8,18,30,.9);
+  color: var(--text2);
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: .68rem;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  letter-spacing: .5px;
+  z-index: 50;
+  transition: all .2s;
+}
+.admin-link:hover { color: var(--gold); border-color: var(--gold); }
+
+/* ── BOOKING SECTION BG IMAGE ── */
+#bookingSection {
+  position: relative;
+}
+#bookingSection::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('/assets/carousel-1.jpg') center/cover no-repeat;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+#bookingSection > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* MOBILE */
+@media (max-width: 680px) {
+  .bk-layout { grid-template-columns: 1fr; }
+  .steps .step-label { display: none; }
+  .topbar-tagline { display: none; }
+  .time-grid { grid-template-columns: repeat(2,1fr); }
+  .bk-main { padding: 16px 12px 80px; }
+  .topbar { padding: 8px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero" id="heroSection">
+  <div class="hero-bg">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-slide"><img src="/assets/carousel-1.jpg" alt="Court at sunset" loading="eager" fetchpriority="high"></div>
+      <div class="carousel-slide"><img src="/assets/carousel-2.jpg" alt="Players on court" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/carousel-3.jpg" alt="Venue" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/carousel-4.jpg" alt="Coffee" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/carousel-5.jpg" alt="Interior" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/carousel-6.jpg" alt="Court at night" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/venue-deck.jpg" alt="Bamboo deck" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/venue-treehouse.jpg" alt="Treehouse view" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/venue-interior.jpg" alt="Interior with lanterns" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/venue-food.jpg" alt="Food and drinks" loading="lazy" decoding="async"></div>
+      <div class="carousel-slide"><img src="/assets/venue-bar.jpg" alt="Bar counter" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <div class="hero-logo-badge">
+      <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <span class="hero-logo-badge-fallback" style="display:none">🏓</span>
+    </div>
+    <h1 class="hero-title">DINK &amp; DIRT</h1>
+    <p class="hero-sub1">Pickleball Court</p>
+    <p class="hero-sub2">Crafted for the Modern Game</p>
+    <div class="hero-divider"></div>
+    <div class="hero-cta-icon" onclick="openRulesModal()"><img src="/assets/pickleball.webp" alt="Pickleball" style="width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))"></div>
+    <div class="hero-cta-text" onclick="openRulesModal()">TAP TO BOOK</div>
+    <p class="hero-cta-sub">Select a date and reserve your slot</p>
+    <p class="hero-location">Dink &amp; Dirt Pickleball</p>
+  </div>
+
+  <button class="carousel-btn prev" onclick="carouselMove(-1)">‹</button>
+  <button class="carousel-btn next" onclick="carouselMove(1)">›</button>
+  <div class="carousel-dots" id="carouselDots"></div>
+</div>
+
+<!-- ═══ RULES MODAL ═══ -->
+<div class="modal-overlay" id="rulesModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>BEFORE YOU BOOK</h2>
+      <p>Booking &amp; Court Rules</p>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.83rem;color:var(--text2);margin-bottom:14px;line-height:1.6">Please take a moment to read these rules. They help every booking start safely and on time.</p>
+      <div class="rule-item">
+        <div class="rule-num">1</div>
+        <div>
+          <div class="rule-title">⏰ Arrive on time</div>
+          <div class="rule-body">Please arrive 10 minutes early to warm up. Your slot begins and ends at the exact times you booked.</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">2</div>
+        <div>
+          <div class="rule-title">🚫 No cancellations after booking</div>
+          <div class="rule-body">Cancellations must be made at least 6 hours before your scheduled time. No-shows and late cancellations are non-refundable.</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">3</div>
+        <div>
+          <div class="rule-title">🔄 Rebooking policy</div>
+          <div class="rule-body">Rebooking requests must be made at least 6 hours in advance and are subject to court availability. Contact us at 0976-040-2293 to rebook.</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">4</div>
+        <div>
+          <div class="rule-title">🌧️ Weather cancellations</div>
+          <div class="rule-body">This is an outdoor court. In case of rain or a natural calamity, we will contact you to reschedule at no extra charge.</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">5</div>
+        <div>
+          <div class="rule-title">💰 Payment required to confirm</div>
+          <div class="rule-body">Upload your GCash or cash payment screenshot to secure your slot. Your booking is only confirmed upon receipt of payment.</div>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">6</div>
+        <div>
+          <div class="rule-title">🤝 Respect the court &amp; players</div>
+          <div class="rule-body">Be kind to all players. Vacate the court promptly when your time is up so the next booking can start on time.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeRulesModal()">Cancel</button>
+      <button class="btn-agree" onclick="agreeAndBook()">I Agree &amp; Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BOOKING SECTION ═══ -->
+<div id="bookingSection">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" onerror="this.style.display='none'">
+      <div class="topbar-logo-text">
+        <div class="tl-name">DINK &amp; DIRT</div>
+        <div class="tl-loc">Pickleball Court</div>
+      </div>
+    </div>
+    <div class="topbar-tagline">Crafted for the Modern Game</div>
+    <div class="topbar-contact">
+      <a href="tel:09760402293">📞 0976-040-2293</a>
+    </div>
+  </div>
+
+  <!-- PROMO BANNER -->
+  <div id="promoBanner" style="display:none">
+    <a id="promoBannerLink" href="#" target="_blank" rel="noopener" style="display:block">
+      <img id="promoBannerImg" src="" alt="Promo" style="width:100%;max-height:220px;object-fit:cover;display:block">
+    </a>
+  </div>
+
+  <div class="bk-main">
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">🎉</div>
+      <h2>BOOKING CONFIRMED!</h2>
+      <p>See you on the court! Your spot is secured.</p>
+      <div class="bk-card" id="confirmCard"></div>
+      <p style="font-size:.78rem;color:var(--text3);margin-top:8px">Questions? Call <strong style="color:var(--text2)">0976-040-2293</strong></p>
+      <button class="btn-new" onclick="resetBooking()">📅 BOOK ANOTHER SLOT</button>
+    </div>
+
+    <div id="bookingLayout">
+      <div class="bk-heading">
+        <h1>SELECT YOUR DATE &amp; TIME</h1>
+        <p>Choose a date on the calendar, then pick your available time slots below.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step active" id="step1"><span class="step-num">1</span> <span class="step-label">Pick a Date</span></div>
+        <div class="step" id="step2"><span class="step-num">2</span> <span class="step-label">Choose Hours</span></div>
+        <div class="step" id="step3"><span class="step-num">3</span> <span class="step-label">Your Details</span></div>
+      </div>
+
+      <div class="bk-layout">
+        <!-- LEFT: Calendar + Slots -->
+        <div>
+          <!-- Calendar -->
+          <div class="panel" style="margin-bottom:14px">
+            <div class="panel-hd">📅 Booking Date</div>
+            <div class="panel-bd">
+              <div class="cal-nav-row">
+                <button class="cal-nav-btn" onclick="prevMonth()">‹</button>
+                <div class="cal-month-label" id="calMonth"></div>
+                <button class="cal-nav-btn" onclick="nextMonth()">›</button>
+              </div>
+              <div class="cal-grid" id="calGrid"></div>
+            </div>
+          </div>
+
+          <!-- Time Slots -->
+          <div id="dateSlotsContainer">
+            <div class="panel">
+              <div class="panel-hd">⏰ Available Times</div>
+              <div class="panel-bd">
+                <div class="no-date-msg"><div class="big">👆</div>Select a date above to see available slots</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Form -->
+        <div class="panel">
+          <div class="panel-hd">📋 Your Booking Details</div>
+          <div class="panel-bd">
+            <div class="outdoor-notice">
+              <strong>⛅ Outdoor Court Notice</strong>
+              This is an outdoor pickleball court. Please check the weather before heading out. Games may be affected by rain or extreme heat.
+            </div>
+            <div class="bk-summary" id="bookingSummary">
+              <div class="sum-empty">Select a date &amp; time first →</div>
+            </div>
+            <div id="errorMsg" class="error-msg" style="display:none"></div>
+            <div class="fg"><label>Full Name *</label><input type="text" id="custName" placeholder="e.g. Juan dela Cruz" maxlength="60"></div>
+            <div class="fg"><label>Phone Number *</label><input type="tel" id="custPhone" placeholder="e.g. 09XX-XXX-XXXX" maxlength="20"></div>
+            <div class="fg"><label>Notes (optional)</label><textarea id="custNotes" rows="2" placeholder="Number of players, requests..."></textarea></div>
+            <div class="fg">
+              <label>Payment Info</label>
+              <div class="pay-box">
+                <div class="pay-title">💰 Pay via GCash · ₱250/Hour</div>
+                <div class="pay-number-box">
+                  <span class="pay-lbl">GCash Number</span>
+                  <a href="tel:09760402293" class="pay-val">0976-040-2293</a>
+                </div>
+                <div class="pay-name">Account Name: <strong>RO**E L.</strong></div>
+                <div class="pay-divider"><span>or scan QR</span></div>
+                <img src="/assets/gcash-qr-optimized.jpg" alt="GCash QR Code" class="pay-qr">
+                <div class="pay-hint">After paying, upload your receipt screenshot below to secure your slot.</div>
+              </div>
+            </div>
+            <div class="fg">
+              <label>Payment Screenshot *</label>
+              <div class="upload-area" id="uploadArea" onclick="document.getElementById('payFile').click()">
+                <input type="file" id="payFile" accept="image/*" onchange="handleFileSelect(event)">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Tap to upload GCash / Maya / Bank transfer screenshot</div>
+                <img id="uploadPreview" class="upload-preview" style="display:none">
+              </div>
+            </div>
+            <button class="btn-submit" id="submitBtn" onclick="submitBooking()" disabled>
+              SECURE MY SLOT 🏓
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div style="margin-bottom:6px">
+      <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" style="height:26px;margin:0 auto 5px;border-radius:50%;border:1px solid rgba(201,162,39,.3);opacity:.6">
+    </div>
+    <div>📞 <a href="tel:09760402293">0976-040-2293</a> &nbsp;·&nbsp; Court Opens 1PM–12MN</div>
+    <div style="margin-top:6px;opacity:.4">© 2026 Dink &amp; Dirt Pickleball</div>
+  </footer>
+</div>
+
+
+<script>
+const API='/api/bookings';
+const OPEN_HOUR=13;
+const CLOSE_HOUR=23;
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+let viewYear=new Date().getFullYear(),viewMonth=new Date().getMonth();
+let bulkSelections=new Map();
+let allBookings={};
+let paymentBase64=null,paymentType=null;
+let customerOpenHour=OPEN_HOUR;
+let customerCloseHour=CLOSE_HOUR;
+
+/* ── MODAL ── */
+function openRulesModal(){
+  document.getElementById('rulesModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeRulesModal(){
+  document.getElementById('rulesModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function agreeAndBook(){
+  closeRulesModal();
+  document.getElementById('heroSection').style.display='none';
+  const bs=document.getElementById('bookingSection');
+  bs.classList.add('visible');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('rulesModal').addEventListener('click',function(e){
+  if(e.target===this)closeRulesModal();
+});
+
+/* ── SETTINGS ── */
+async function loadSettings(){
+  try{
+    const r=await fetch(`${API}/settings`);
+    const d=await r.json();
+    if(d.settings){
+      customerOpenHour=d.settings.customerOpenHour??OPEN_HOUR;
+      customerCloseHour=d.settings.customerCloseHour??CLOSE_HOUR;
+    }
+  }catch(e){}
+}
+
+/* ── CAROUSEL ── */
+let carouselIndex=0;
+let carouselCount=0;
+let carouselPaused=false;
+
+function initCarousel(count){
+  carouselCount=count;
+  const dotsEl=document.getElementById('carouselDots');
+  dotsEl.innerHTML='';
+  for(let i=0;i<count;i++){
+    const dot=document.createElement('div');
+    dot.className='carousel-dot'+(i===0?' active':'');
+    dot.onclick=()=>carouselGo(i);
+    dotsEl.appendChild(dot);
+  }
+  carouselIndex=0;
+  document.getElementById('carouselTrack').style.transform='translateX(0)';
+}
+function carouselMove(dir){carouselGo(carouselIndex+dir);}
+function carouselGo(i){
+  if(carouselCount<1)return;
+  if(i<0)i=carouselCount-1;
+  if(i>=carouselCount)i=0;
+  carouselIndex=i;
+  document.getElementById('carouselTrack').style.transform=`translateX(-${i*100}%)`;
+  document.querySelectorAll('.carousel-dot').forEach((d,idx)=>d.classList.toggle('active',idx===i));
+}
+document.addEventListener('visibilitychange',()=>{carouselPaused=document.hidden;});
+setInterval(()=>{if(!carouselPaused&&carouselCount>1)carouselMove(1);},4000);
+
+async function initHero(){
+  try{
+    const r=await fetch(`${API}/hero-settings`);
+    const d=await r.json();
+    const s=d.settings;
+    if(!s||!s.useCustomImages||!s.images||!s.images.length){
+      initCarousel(document.querySelectorAll('.carousel-slide').length);
+      return;
+    }
+    const track=document.getElementById('carouselTrack');
+    if(s.mode==='static'){
+      track.innerHTML=`<div class="carousel-slide"><img src="${s.images[0]}" alt="Dink &amp; Dirt Pickleball" loading="eager" fetchpriority="high"></div>`;
+      document.getElementById('carouselDots').style.display='none';
+      document.querySelectorAll('.carousel-btn').forEach(b=>b.style.display='none');
+      initCarousel(1);
+    }else{
+      track.innerHTML=s.images.map((src,i)=>`<div class="carousel-slide"><img src="${src}" alt="Dink &amp; Dirt Pickleball photo ${i+1}" loading="${i===0?'eager':'lazy'}" ${i===0?'fetchpriority="high"':'decoding="async"'}></div>`).join('');
+      initCarousel(s.images.length);
+    }
+  }catch(e){
+    initCarousel(document.querySelectorAll('.carousel-slide').length);
+  }
+}
+
+/* ── UTILS ── */
+function formatHour(h){
+  const hrs=Math.floor(h),period=hrs<12?'AM':'PM';
+  const d=hrs>12?hrs-12:(hrs===0?12:hrs);
+  return `${d}:00 ${period}`;
+}
+
+/* ── BOOKINGS DATA ── */
+async function loadMonthBookings(){
+  const month=`${viewYear}-${String(viewMonth+1).padStart(2,'0')}`;
+  try{
+    const r=await fetch(`${API}?month=${month}`);
+    const d=await r.json();
+    allBookings={};
+    (d.bookings||[]).forEach(b=>{
+      if(b.status==='cancelled'||b.status==='on_hold')return;
+      if(!allBookings[b.date])allBookings[b.date]=[];
+      allBookings[b.date].push(b);
+    });
+  }catch(e){console.error(e);}
+}
+
+/* ── CALENDAR ── */
+function renderCalendarUI(){
+  document.getElementById('calMonth').textContent=`${MONTHS[viewMonth]} ${viewYear}`;
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  DAYS.forEach(d=>{const e=document.createElement('div');e.className='cal-dow';e.textContent=d;grid.appendChild(e);});
+  const firstDay=new Date(viewYear,viewMonth,1).getDay();
+  const daysInMonth=new Date(viewYear,viewMonth+1,0).getDate();
+  const today=new Date();
+  for(let i=0;i<firstDay;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cellDate=new Date(viewYear,viewMonth,d);
+    const isToday=d===today.getDate()&&viewMonth===today.getMonth()&&viewYear===today.getFullYear();
+    const isPast=cellDate<new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    const el=document.createElement('div');
+    el.className='cal-day'+(isToday?' today':'')+(isPast?' past':'')+(bulkSelections.has(dateStr)?' selected':'');
+    const dayBks=allBookings[dateStr]||[];
+    const totalBooked=dayBks.reduce((s,b)=>s+(b.endHour-b.startHour),0);
+    const num=document.createElement('span');num.textContent=d;el.appendChild(num);
+    if(dayBks.length>0){
+      el.classList.add('has-bookings');
+      if(totalBooked>=(customerCloseHour-customerOpenHour))el.classList.add('full-day');
+      const dot=document.createElement('div');dot.className='dot';el.appendChild(dot);
+    }
+    if(!isPast)el.addEventListener('click',()=>toggleDate(dateStr));
+    grid.appendChild(el);
+  }
+}
+
+async function renderCalendar(){
+  await loadMonthBookings();
+  renderCalendarUI();
+}
+function prevMonth(){viewMonth--;if(viewMonth<0){viewMonth=11;viewYear--;}renderCalendar();}
+function nextMonth(){viewMonth++;if(viewMonth>11){viewMonth=0;viewYear++;}renderCalendar();}
+
+function toggleDate(dateStr){
+  if(bulkSelections.has(dateStr)){bulkSelections.delete(dateStr);}
+  else{bulkSelections.set(dateStr,new Set());}
+  renderCalendarUI();renderDateSlotsContainer();updateSummary();updateSubmitBtn();
+  if(window.innerWidth<681&&bulkSelections.size>0){
+    setTimeout(()=>document.getElementById('dateSlotsContainer').scrollIntoView({behavior:'smooth',block:'start'}),100);
+  }
+}
+function removeDate(dateStr){
+  bulkSelections.delete(dateStr);
+  renderCalendarUI();renderDateSlotsContainer();updateSummary();updateSubmitBtn();
+}
+
+/* ── SLOT RENDER ── */
+function renderDateSlotsContainer(){
+  const container=document.getElementById('dateSlotsContainer');
+  if(bulkSelections.size===0){
+    container.innerHTML=`<div class="panel"><div class="panel-hd">⏰ Available Times</div><div class="panel-bd"><div class="no-date-msg"><div class="big">👆</div>Select a date above to see available slots</div></div></div>`;
+    return;
+  }
+  container.innerHTML='';
+  for(const[dateStr,slots] of bulkSelections){
+    const[y,m,d]=dateStr.split('-');
+    const shortDate=new Date(y,m-1,d).toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric'});
+    const dayBks=allBookings[dateStr]||[];
+    const bookedRanges=dayBks.map(b=>({start:b.startHour,end:b.endHour,name:b.name,type:b.type||b.bookingType}));
+    const availCount=[...Array(customerCloseHour-customerOpenHour)].filter((_,i)=>{
+      const h=customerOpenHour+i;
+      return !bookedRanges.some(r=>h<r.end&&(h+1)>r.start);
+    }).length;
+
+    const panel=document.createElement('div');
+    panel.className='panel date-slot-panel';
+    panel.style.marginBottom='12px';
+
+    const hd=document.createElement('div');
+    hd.className='panel-hd';
+    hd.style.justifyContent='space-between';
+    hd.innerHTML=`<span>⏰ ${shortDate}</span><button onclick="removeDate('${dateStr}')" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.6);border-radius:6px;cursor:pointer;padding:2px 9px;font-size:.82rem;transition:background .15s" onmouseover="this.style.background='rgba(196,68,68,.3)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">✕</button>`;
+
+    const bd=document.createElement('div');
+    bd.className='panel-bd';
+
+    const badge=document.createElement('div');
+    badge.className='avail-badge';
+    badge.textContent=`${availCount} available`;
+    bd.appendChild(badge);
+
+    const grid=document.createElement('div');
+    grid.className='time-grid';
+
+    for(let h=customerOpenHour;h<customerCloseHour;h++){
+      const end=h+1;
+      const takenBy=bookedRanges.find(r=>h<r.end&&end>r.start);
+      const isBooked=!!takenBy;
+      const isSelected=slots.has(h);
+
+      const el=document.createElement('div');
+      el.className='time-slot'+(isBooked?' taken':'')+(isSelected?' selected':'');
+
+      const lbl=document.createElement('div');lbl.className='ts-label';
+      lbl.textContent=`${formatHour(h)} – ${formatHour(end)}`;
+      el.appendChild(lbl);
+
+      if(isBooked){
+        const sl=document.createElement('div');sl.className='ts-taken-label';
+        sl.textContent=takenBy.type==='block'?'Blocked':takenBy.type==='open_play'?'Open Play':'Booked';
+        el.appendChild(sl);
+      }else{
+        const pr=document.createElement('div');pr.className='ts-price';pr.textContent='₱250';
+        el.appendChild(pr);
+      }
+
+      if(!isBooked)el.addEventListener('click',()=>toggleSlotOnDate(dateStr,h));
+      grid.appendChild(el);
+    }
+    bd.appendChild(grid);
+    panel.appendChild(hd);
+    panel.appendChild(bd);
+    container.appendChild(panel);
+  }
+}
+
+function toggleSlotOnDate(dateStr,h){
+  const slots=bulkSelections.get(dateStr);
+  if(!slots)return;
+  if(slots.has(h))slots.delete(h);else slots.add(h);
+  renderDateSlotsContainer();updateSummary();updateSubmitBtn();
+  updateSteps();
+}
+
+/* ── SUMMARY ── */
+function slotsToRanges(slots){
+  const sorted=[...slots].sort((a,b)=>a-b);
+  if(!sorted.length)return[];
+  const ranges=[];let rs=sorted[0],prev=sorted[0];
+  for(let i=1;i<sorted.length;i++){
+    if(sorted[i]===prev+1){prev=sorted[i];}
+    else{ranges.push([rs,prev+1]);rs=sorted[i];prev=sorted[i];}
+  }
+  ranges.push([rs,prev+1]);
+  return ranges;
+}
+
+function updateSummary(){
+  const el=document.getElementById('bookingSummary');
+  let totalSlots=0;
+  for(const s of bulkSelections.values())totalSlots+=s.size;
+  if(totalSlots===0){el.innerHTML='<div class="sum-empty">Select a date &amp; time first →</div>';return;}
+  let html='';let grandTotal=0;
+  for(const[dateStr,slots] of bulkSelections){
+    if(!slots.size)continue;
+    const[y,m,d]=dateStr.split('-');
+    const dateLabel=new Date(y,m-1,d).toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric'});
+    const ranges=slotsToRanges(slots);
+    const timeRows=ranges.map(r=>`<div class="sum-row"><span style="padding-left:8px">⏰ ${formatHour(r[0])} – ${formatHour(r[1])}</span><span>${r[1]-r[0]}h</span></div>`).join('');
+    grandTotal+=slots.size;
+    html+=`<div style="border-bottom:1px solid var(--border2);padding-bottom:8px;margin-bottom:8px"><div class="sum-row" style="margin-bottom:3px"><span style="font-weight:600;color:#fff">📅 ${dateLabel}</span></div>${timeRows}</div>`;
+  }
+  html+=`<div class="sum-row"><span>Total Hours</span><span>${grandTotal}h</span></div><div class="sum-row total"><span>Total Due</span><span>₱${(grandTotal*250).toLocaleString()}</span></div>`;
+  el.innerHTML=html;
+}
+
+function updateSubmitBtn(){
+  let total=0;for(const s of bulkSelections.values())total+=s.size;
+  document.getElementById('submitBtn').disabled=total===0;
+}
+
+function updateSteps(){
+  let total=0;for(const s of bulkSelections.values())total+=s.size;
+  document.getElementById('step1').className='step'+(bulkSelections.size>0?' active':'');
+  document.getElementById('step2').className='step'+(bulkSelections.size>0?' active':'');
+  document.getElementById('step3').className='step'+(total>0?' active':'');
+}
+
+/* ── FILE UPLOAD ── */
+function compressImage(file){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1024;let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg',0.7));
+    };
+    img.src=URL.createObjectURL(file);
+  });
+}
+
+async function handleFileSelect(e){
+  const file=e.target.files[0];if(!file)return;
+  document.querySelector('#uploadArea .upload-text').textContent='Processing...';
+  try{
+    paymentBase64=await compressImage(file);
+    paymentType='image/jpeg';
+    document.getElementById('uploadArea').classList.add('has-file');
+    document.querySelector('#uploadArea .upload-text').textContent=`✓ ${file.name}`;
+    const prev=document.getElementById('uploadPreview');prev.src=paymentBase64;prev.style.display='block';
+  }catch(err){
+    document.querySelector('#uploadArea .upload-text').textContent='Failed to process image. Try again.';
+  }
+}
+
+/* ── SUBMIT ── */
+async function submitBooking(){
+  const name=document.getElementById('custName').value.trim();
+  const phone=document.getElementById('custPhone').value.trim();
+  const notes=document.getElementById('custNotes').value.trim();
+  const errEl=document.getElementById('errorMsg');
+  errEl.style.display='none';
+  if(!name)return showError('Please enter your name.');
+  if(!phone)return showError('Please enter your phone number.');
+  let totalSlots=0;for(const s of bulkSelections.values())totalSlots+=s.size;
+  if(totalSlots===0)return showError('Please select a date and time.');
+  if(!paymentBase64)return showError('Please upload your payment screenshot to secure your spot.');
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>SECURING...';
+  const submittedBookings=[];let firstCall=true;
+  try{
+    for(const[dateStr,slots] of bulkSelections){
+      if(!slots.size)continue;
+      const ranges=slotsToRanges(slots);
+      for(const[start,end] of ranges){
+        const res=await fetch(API,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({name,phone,notes,date:dateStr,startHour:start,endHour:end,paymentData:firstCall?paymentBase64:null,paymentType:firstCall?paymentType:null})
+        });
+        const data=await res.json();
+        if(!res.ok){
+          showError(data.error||`Couldn't book ${formatHour(start)}–${formatHour(end)} on ${dateStr}.${submittedBookings.length?' Some slots were already booked.':''}`);
+          btn.disabled=false;btn.textContent='SECURE MY SLOT 🏓';
+          return;
+        }
+        submittedBookings.push(data.booking);firstCall=false;
+      }
+    }
+    showSuccess(submittedBookings,name,phone);
+  }catch(e){
+    showError('Network error. Please try again.');
+    btn.disabled=false;btn.textContent='SECURE MY SLOT 🏓';
+  }
+}
+
+function showError(msg){const el=document.getElementById('errorMsg');el.textContent=msg;el.style.display='block';el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+
+function showSuccess(bookings,name,phone){
+  document.getElementById('bookingLayout').style.display='none';
+  const sc=document.getElementById('successScreen');sc.classList.add('visible');
+  const list=Array.isArray(bookings)?bookings:[bookings];
+  const totalHours=list.reduce((s,b)=>s+(b.endHour-b.startHour),0);
+  const byDate={};
+  list.forEach(b=>{if(!byDate[b.date])byDate[b.date]=[];byDate[b.date].push(b);});
+  let dateRows='';
+  for(const[dateStr,bks] of Object.entries(byDate)){
+    const[y,m,d]=dateStr.split('-');
+    const dateLabel=new Date(y,m-1,d).toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric'});
+    const timeStr=bks.map(b=>`${formatHour(b.startHour)}–${formatHour(b.endHour)}`).join(', ');
+    dateRows+=`<div class="bc-row"><span>📅 ${dateLabel}</span><span>${timeStr}</span></div>`;
+  }
+  document.getElementById('confirmCard').innerHTML=`
+    <h3>🏓 BOOKING DETAILS</h3>
+    <div class="bc-row"><span>Name</span><span>${name}</span></div>
+    <div class="bc-row"><span>Phone</span><span>${phone}</span></div>
+    ${dateRows}
+    <div class="bc-row"><span>Total Duration</span><span>${totalHours}h</span></div>
+    <div class="bc-row" style="color:var(--gold);font-weight:700"><span>Total Due</span><span>₱${(totalHours*250).toLocaleString()}</span></div>
+    <div class="bc-row"><span>Status</span><span style="color:#7ACA50">✅ Confirmed</span></div>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetBooking(){
+  bulkSelections=new Map();paymentBase64=null;paymentType=null;
+  document.getElementById('custName').value='';
+  document.getElementById('custPhone').value='';
+  document.getElementById('custNotes').value='';
+  document.getElementById('payFile').value='';
+  document.getElementById('uploadArea').classList.remove('has-file');
+  document.querySelector('#uploadArea .upload-text').textContent='Tap to upload GCash / Maya / Bank transfer screenshot';
+  document.getElementById('uploadPreview').style.display='none';
+  document.getElementById('successScreen').classList.remove('visible');
+  document.getElementById('bookingLayout').style.display='block';
+  document.getElementById('submitBtn').textContent='SECURE MY SLOT 🏓';
+  renderCalendar();renderDateSlotsContainer();updateSummary();updateSubmitBtn();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function initBanner(){
+  try{
+    const r=await fetch(`${API}/banner`);
+    const d=await r.json();
+    const b=d.banner;
+    if(!b||!b.active||!b.imageData)return;
+    const wrap=document.getElementById('promoBanner');
+    const img=document.getElementById('promoBannerImg');
+    const lnk=document.getElementById('promoBannerLink');
+    img.src=b.imageData;
+    if(b.link){lnk.href=b.link;}else{lnk.style.pointerEvents='none';}
+    wrap.style.display='block';
+  }catch(e){}
+}
+
+(async()=>{await Promise.all([loadSettings(),initHero(),initBanner()]);renderCalendar();})();
+</script>
+</body>
+</html>

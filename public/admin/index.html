@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Dink &amp; Dirt Pickleball</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f5e8;
+  --yellow:#f0c040;--yellow-dark:#c99a00;
+  --red:#c44444;--red-pale:#fee;
+  --blue:#3a6fb5;--blue-pale:#e8eefd;
+  --orange:#a05000;--orange-pale:#fff0e0;
+  --purple:#6b21a8;--purple-light:#7c3aed;--purple-pale:#f5f3ff;
+  --white:#fafaf7;--text:#1a1a1a;--muted:#666;--border:#ddd;
+  --radius:10px;--sidebar:240px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#f4f4f0;color:var(--text);min-height:100vh;}
+
+/* LOGIN */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--green);padding:16px;}
+.login-box{background:white;border-radius:16px;padding:32px 28px;width:100%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.login-box .icon{font-size:2.5rem;margin-bottom:10px;}
+.login-box h2{font-family:'Bebas Neue',cursive;font-size:1.7rem;letter-spacing:2px;color:var(--green);margin-bottom:4px;}
+.login-box p{color:var(--muted);font-size:0.8rem;margin-bottom:20px;}
+.login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;margin-bottom:10px;}
+.login-box input:focus{outline:none;border-color:var(--green);}
+.login-box input.error{border-color:var(--red);background:#fff5f5;}
+.login-box button{width:100%;padding:12px;background:var(--green);color:white;border:none;border-radius:8px;font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:2px;cursor:pointer;}
+.login-box button:disabled{opacity:0.6;cursor:not-allowed;}
+.login-error{
+  background:var(--red-pale);border:1px solid #fcc;color:var(--red);
+  padding:8px 12px;border-radius:6px;font-size:0.78rem;margin-top:8px;
+  display:none;text-align:left;
+}
+.login-error.visible{display:block;}
+
+/* LAYOUT */
+.admin-app{display:none;min-height:100vh;}
+.admin-app.visible{display:flex;}
+
+/* Sidebar */
+.sidebar{
+  width:var(--sidebar);background:var(--green);color:white;
+  display:flex;flex-direction:column;flex-shrink:0;
+  position:fixed;top:0;left:0;bottom:0;overflow-y:auto;
+  transition:transform 0.3s ease;
+  z-index:50;
+}
+.sidebar-header{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,0.1);position:relative;}
+.sidebar-header h2{font-family:'Bebas Neue',cursive;font-size:1.15rem;letter-spacing:2px;}
+.sidebar-header p{font-size:0.7rem;opacity:0.6;margin-top:2px;}
+.sidebar-close{
+  display:none;position:absolute;top:14px;right:14px;
+  background:none;border:none;color:white;cursor:pointer;
+  font-size:1.5rem;opacity:0.7;padding:0;width:28px;height:28px;
+}
+.sidebar-close:hover{opacity:1;}
+.sidebar-nav{padding:10px 0;flex:1;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;
+  font-size:0.85rem;font-weight:500;transition:background 0.15s;
+  border-left:3px solid transparent;
+}
+.nav-item:hover{background:rgba(255,255,255,0.08);}
+.nav-item.active{background:rgba(255,255,255,0.12);border-left-color:var(--yellow);}
+.sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);font-size:0.72rem;opacity:0.5;}
+
+/* Backdrop for mobile */
+.sidebar-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+  z-index:40;
+}
+.sidebar-backdrop.visible{display:block;}
+
+/* Content */
+.content{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{
+  background:white;padding:12px 24px;display:flex;align-items:center;
+  gap:12px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:10;box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.hamburger{
+  display:none;background:var(--green);color:white;border:none;
+  width:38px;height:38px;border-radius:8px;cursor:pointer;
+  font-size:1.2rem;align-items:center;justify-content:center;flex-shrink:0;
+}
+.topbar h1{font-family:'Bebas Neue',cursive;font-size:1.4rem;letter-spacing:1.5px;color:var(--green);flex:1;}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.refresh-btn{
+  background:var(--green-pale);color:var(--green);border:1px solid var(--green);
+  padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.78rem;font-weight:600;
+  display:flex;align-items:center;gap:5px;
+}
+.refresh-btn:hover{background:var(--green);color:white;}
+.page{padding:20px 24px;flex:1;display:none;}
+.page.active{display:block;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{background:white;border-radius:12px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,0.06);}
+.stat-card .stat-label{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.stat-card .stat-value{font-family:'Bebas Neue',cursive;font-size:1.9rem;letter-spacing:1px;color:var(--green);}
+.stat-card .stat-sub{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+
+/* TABLE */
+.table-wrap{background:white;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:18px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:600px;}
+th{background:#f8f8f4;padding:10px 13px;text-align:left;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:10px 13px;font-size:0.82rem;border-bottom:1px solid #f0f0eb;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafaf7;}
+
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:600;}
+.badge-green{background:var(--green-pale);color:var(--green);}
+.badge-red{background:var(--red-pale);color:var(--red);}
+.badge-yellow{background:#fff9e0;color:var(--yellow-dark);}
+.badge-orange{background:var(--orange-pale);color:var(--orange);}
+.badge-blue{background:var(--blue-pale);color:var(--blue);}
+.badge-purple{background:var(--purple-pale);color:var(--purple);}
+
+.action-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.btn-sm{padding:4px 9px;border:none;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+.btn-sm:hover{opacity:0.8;}
+.btn-edit{background:var(--blue-pale);color:var(--blue);}
+.btn-cancel{background:var(--red-pale);color:var(--red);}
+.btn-view{background:var(--green-pale);color:var(--green);}
+.btn-delete{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;}
+.btn-rebook{background:#fff3e0;color:#b8740a;border:1px solid #f0c888;}
+.btn-hold{background:var(--purple-pale);color:var(--purple);border:1px solid #c4b5fd;}
+.badge-rebook{background:#fff3e0;color:#b8740a;border:1px solid #f0c888;font-size:0.62rem;display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;white-space:nowrap;}
+.modal-header.amber{background:#c4923a;}
+
+/* CALENDAR */
+.period-nav{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.period-nav button{padding:6px 13px;border:1.5px solid var(--border);background:white;border-radius:8px;cursor:pointer;font-size:0.8rem;font-family:'DM Sans',sans-serif;font-weight:500;}
+.period-nav button:hover{border-color:var(--green);color:var(--green);}
+.period-label{font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--green);}
+.admin-cal{background:white;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:18px;overflow-x:auto;}
+.admin-cal-inner{min-width:560px;}
+.admin-cal-header{background:var(--green);color:white;display:grid;grid-template-columns:repeat(7,1fr);padding:9px 0;}
+.admin-cal-header div{text-align:center;font-size:0.72rem;font-weight:600;letter-spacing:0.5px;}
+.admin-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.admin-cal-cell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-height:85px;padding:5px;cursor:pointer;transition:background 0.15s;}
+.admin-cal-cell:nth-child(7n){border-right:none;}
+.admin-cal-cell:hover{background:var(--green-pale);}
+.admin-cal-cell.empty{background:#fafaf8;cursor:default;}
+.admin-cal-cell .cell-date{font-size:0.76rem;font-weight:600;margin-bottom:3px;color:var(--muted);}
+.admin-cal-cell.today .cell-date{color:var(--green);}
+.cell-booking{border-radius:3px;padding:2px 5px;font-size:0.62rem;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cell-booking.customer{background:var(--green);color:white;}
+.cell-booking.internal{background:var(--blue);color:white;}
+.cell-booking.blocked{background:var(--orange);color:white;}
+.cell-booking.cancelled{background:#ccc;color:#666;}
+.cell-booking.on_hold{background:var(--purple);color:white;}
+.cell-more{font-size:0.62rem;color:var(--muted);}
+.cell-dots{display:none;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:2px;}
+.cell-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cell-dot.customer{background:var(--green);}
+.cell-dot.internal{background:var(--blue);}
+.cell-dot.blocked{background:var(--orange);}
+.cell-dot.on_hold{background:var(--purple);}
+.cell-more-dot{font-size:0.55rem;color:var(--muted);width:100%;text-align:center;line-height:1;}
+.on-hold-panel{background:white;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,0.06);margin-bottom:18px;overflow:hidden;border:2px solid var(--purple-pale);}
+.on-hold-header{padding:13px 18px;background:var(--purple);color:white;font-family:'Bebas Neue',cursive;font-size:1.05rem;letter-spacing:1.5px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.on-hold-item{padding:11px 14px;border-bottom:1px solid var(--purple-pale);display:flex;align-items:flex-start;gap:10px;}
+.on-hold-item:last-child{border-bottom:none;}
+.on-hold-item .reason-tag{font-size:0.72rem;background:var(--purple-pale);color:var(--purple);border-radius:4px;padding:2px 7px;margin-top:3px;display:inline-block;}
+
+/* FORMS */
+.form-group{margin-bottom:13px;}
+.form-group label{display:block;font-size:0.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.86rem;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--green);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* BUTTONS */
+.btn-primary{padding:10px 18px;background:var(--green);color:white;border:none;border-radius:8px;font-family:'Bebas Neue',cursive;font-size:0.98rem;letter-spacing:1.5px;cursor:pointer;}
+.btn-primary:hover{background:var(--green-light);}
+.btn-secondary{padding:10px 16px;background:#f0f0ec;color:var(--text);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.83rem;cursor:pointer;}
+.btn-full{width:100%;padding:12px;border:none;border-radius:8px;font-family:'Bebas Neue',cursive;font-size:1.05rem;letter-spacing:2px;cursor:pointer;transition:all 0.2s;}
+.btn-export{padding:9px 16px;border:1.5px solid var(--green);background:white;color:var(--green);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+.btn-export:hover{background:var(--green);color:white;}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:14px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.modal-header{color:white;padding:14px 18px;font-family:'Bebas Neue',cursive;font-size:1.05rem;letter-spacing:1.5px;display:flex;justify-content:space-between;align-items:center;}
+.modal-header.green{background:var(--green);}
+.modal-close{cursor:pointer;opacity:0.7;font-size:1.2rem;}
+.modal-close:hover{opacity:1;}
+.modal-body{padding:18px;}
+.modal-footer{padding:0 18px 18px;display:flex;gap:10px;justify-content:flex-end;}
+
+/* MISC */
+.panel{background:white;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:18px;}
+.panel-header{padding:13px 18px;font-family:'Bebas Neue',cursive;font-size:1.05rem;letter-spacing:1.5px;color:white;}
+.panel-body{padding:18px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+.filter-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.filter-row input{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.83rem;flex:1;min-width:180px;}
+.export-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.payment-img{max-width:100%;border-radius:8px;margin-top:8px;border:1px solid var(--border);}
+.dash-filter-btn{padding:7px 16px;border:1.5px solid var(--border);border-radius:20px;background:white;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;color:var(--muted);}
+.dash-filter-btn:hover{border-color:var(--green);color:var(--green);}
+.dash-filter-btn.active{background:var(--green);color:white;border-color:var(--green);}
+.pay-upload-box{border:1.5px dashed var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:border-color 0.15s;margin-top:8px;}
+.pay-upload-box:hover{border-color:var(--green);}
+.pay-upload-box input[type=file]{display:none;}
+.no-data{text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;}
+.no-data .big{font-size:2.3rem;margin-bottom:8px;}
+.loading{text-align:center;padding:36px;color:var(--muted);}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.error-banner{background:#fee;border:1px solid #fcc;color:#c44;padding:9px 13px;border-radius:8px;font-size:0.8rem;margin-bottom:12px;}
+.success-banner{background:var(--green-pale);border:1px solid var(--green);color:var(--green);padding:9px 13px;border-radius:8px;font-size:0.8rem;margin-bottom:12px;}
+.type-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.type-customer{background:var(--green-pale);color:var(--green);}
+.type-internal{background:var(--blue-pale);color:var(--blue);}
+.type-block{background:var(--orange-pale);color:var(--orange);}
+.badge-admin-added{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:0.62rem;font-weight:700;background:#eef2f7;color:#475569;border:1px solid #cbd5e1;margin-left:4px;white-space:nowrap;vertical-align:middle;}
+.paddle-note{font-size:0.68rem;color:var(--muted);margin-top:2px;}
+
+/* Mobile cards (alternative to table) */
+.mobile-cards{display:none;}
+.mob-card{
+  background:white;border-radius:10px;padding:14px;margin-bottom:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.mob-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;}
+.mob-card-name{font-weight:600;font-size:0.9rem;}
+.mob-card-row{display:flex;justify-content:space-between;font-size:0.78rem;padding:3px 0;color:var(--muted);}
+.mob-card-row strong{color:var(--text);font-weight:600;}
+.mob-card-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+
+/* MOBILE */
+@media(max-width:780px){
+  :root{--sidebar:240px;}
+  .hamburger{display:flex;}
+  .sidebar{transform:translateX(-100%);box-shadow:2px 0 12px rgba(0,0,0,0.2);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-close{display:block;}
+  .content{margin-left:0;}
+  .page{padding:14px 14px;}
+  .topbar{padding:10px 14px;gap:10px;}
+  .topbar h1{font-size:1.15rem;letter-spacing:1px;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;grid-template-rows:auto;}
+  .stat-card{padding:13px;}
+  .stat-card .stat-value{font-size:1.6rem;}
+  .two-col{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .table-wrap{display:none;}
+  .mobile-cards{display:block;}
+  .refresh-btn span{display:none;}
+  .period-label{font-size:1rem;}
+  .modal{max-height:96vh;}
+
+  /* CALENDAR: drop the fixed min-width so the grid fits the viewport,
+     and swap event bars/text for compact dots (full detail still shows
+     below on tap via showCalDay). */
+  .admin-cal{overflow-x:visible;}
+  .admin-cal-inner{min-width:0;}
+  .admin-cal-header div{font-size:0.62rem;letter-spacing:0;padding:0 1px;}
+  .admin-cal-cell{min-height:44px;padding:3px 1px;}
+  .admin-cal-cell .cell-date{font-size:0.68rem;margin-bottom:1px;text-align:center;}
+  .cell-booking,.cell-more{display:none;}
+  .cell-dots{display:flex;}
+}
+@media(max-width:400px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .admin-cal-cell{min-height:40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="icon">🔒</div>
+    <h2>Admin Login</h2>
+    <p>Dink &amp; Dirt Pickleball Court Management</p>
+    <input type="password" id="loginPass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button id="loginBtn" onclick="doLogin()">Login</button>
+    <div class="login-error" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div class="admin-app" id="adminApp">
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+      <div style="font-size:1.4rem;margin-bottom:5px">🏓</div>
+      <h2>Dink &amp; Dirt Pickleball</h2>
+      <p>Admin Dashboard</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="showPage('dashboard')">📊 Dashboard</div>
+      <div class="nav-item" onclick="showPage('calendar')">📅 Monthly Calendar</div>
+      <div class="nav-item" onclick="showPage('bookings')">📋 All Bookings</div>
+      <div class="nav-item" onclick="showPage('add')">➕ Add Booking</div>
+      <div class="nav-item" onclick="showPage('block')">🚫 Block Time</div>
+      <div class="nav-item" onclick="showPage('notifications')">🔔 Notifications <span id="notifBadge" style="display:none;background:#f0c040;color:#1a1a1a;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:700;margin-left:4px"></span></div>
+      <div class="nav-item" onclick="showPage('hero')">🖼 Hero & Carousel</div>
+      <div class="nav-item" onclick="showPage('banner')">📢 Promo Banner</div>
+      <div class="nav-item" onclick="showPage('settings')">⚙️ Settings</div>
+      <div class="nav-item" onclick="showPage('export')">📤 Export</div>
+    </nav>
+    <div class="sidebar-footer">Logged in as Admin</div>
+  </div>
+
+  <div class="content">
+    <div class="topbar">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="topbar-actions">
+        <button class="refresh-btn" onclick="refreshAll()">🔄<span> Refresh</span></button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Today's Bookings</div><div class="stat-value" id="statToday">–</div><div class="stat-sub">confirmed</div></div>
+        <div class="stat-card"><div class="stat-label">This Month</div><div class="stat-value" id="statMonth">–</div><div class="stat-sub">total bookings</div></div>
+        <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-value" id="statWeek">–</div><div class="stat-sub">bookings</div></div>
+        <div class="stat-card"><div class="stat-label">Hours Today</div><div class="stat-value" id="statHours">–</div><div class="stat-sub">booked hours</div></div>
+        <div class="stat-card" style="border:2px solid var(--purple-pale)"><div class="stat-label" style="color:var(--purple)">On Hold</div><div class="stat-value" id="statOnHold" style="color:var(--purple)">–</div><div class="stat-sub">all pending holds</div></div>
+      </div>
+
+      <!-- ON HOLD PANEL — always visible -->
+      <div class="on-hold-panel">
+        <div class="on-hold-header">
+          <span>⏸ Bookings On Hold</span>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span id="onHoldCount" style="background:rgba(255,255,255,0.25);padding:2px 10px;border-radius:20px;font-size:0.78rem;font-weight:600">0 holds</span>
+            <button onclick="holdAllToday()" style="background:white;color:var(--purple);border:none;padding:5px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;letter-spacing:0.5px">⏸ Hold All Today</button>
+          </div>
+        </div>
+        <div id="onHoldList" style="padding:14px">
+          <div style="text-align:center;color:var(--muted);font-size:0.85rem;padding:8px 0">No bookings currently on hold ✓</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="dash-filter-btn" id="dashBtnYesterday" onclick="setDashFilter('yesterday')">Yesterday</button>
+        <button class="dash-filter-btn active" id="dashBtnToday" onclick="setDashFilter('today')">Today</button>
+        <button class="dash-filter-btn" id="dashBtnTomorrow" onclick="setDashFilter('tomorrow')">Tomorrow</button>
+      </div>
+      <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:1px;color:var(--green);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+        <span id="dashScheduleLabel">Today's Schedule (<span id="todayDateLabel">–</span>)</span>
+      </div>
+      <div id="todayBookings" class="table-wrap"></div>
+      <div id="todayBookingsMobile" class="mobile-cards"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="period-nav">
+        <button onclick="calPrevMonth()">‹ Prev</button>
+        <div class="period-label" id="adminCalLabel"></div>
+        <button onclick="calNextMonth()">Next ›</button>
+      </div>
+      <div class="admin-cal"><div class="admin-cal-inner" id="adminCal"></div></div>
+      <div id="calDayDetail" style="display:none">
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.05rem;letter-spacing:1px;color:var(--green);margin-bottom:10px" id="calDayTitle"></div>
+        <div id="calDayTable" class="table-wrap"></div>
+        <div id="calDayMobile" class="mobile-cards"></div>
+      </div>
+    </div>
+
+    <!-- ALL BOOKINGS -->
+    <div class="page" id="page-bookings">
+      <div class="period-nav" id="bkPeriodNav">
+        <button onclick="bkPrevMonth()">‹ Prev</button>
+        <div class="period-label" id="bkMonthLabel"></div>
+        <button onclick="bkNextMonth()">Next ›</button>
+        <select id="bkMonthJump" onchange="bkJumpToMonth(this.value)" style="margin-left:6px;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:white;cursor:pointer"></select>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <button id="bkFilterMonth" class="dash-filter-btn active" onclick="setBkMode('month')">📅 This Month</button>
+        <button id="bkFilterAll" class="dash-filter-btn" onclick="setBkMode('all')">🗂 All Time</button>
+        <span id="bkLoadingNote" style="font-size:0.75rem;color:var(--muted);display:none"><span class="spinner"></span> Loading all months…</span>
+      </div>
+      <div class="filter-row">
+        <input type="text" id="searchFilter" placeholder="🔍 Search by name or phone..." oninput="filterBookings()">
+      </div>
+      <div class="export-row">
+        <button class="btn-export" onclick="exportCSV('month')">📥 Month CSV</button>
+        <button class="btn-export" onclick="exportCSV('week')">📥 Week CSV</button>
+      </div>
+      <div id="bookingsTable" class="table-wrap"></div>
+      <div id="bookingsMobile" class="mobile-cards"></div>
+    </div>
+
+    <!-- ADD BOOKING -->
+    <div class="page" id="page-add">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header" style="background:var(--blue)">➕ Add Internal Booking</div>
+          <div class="panel-body">
+            <p style="color:var(--muted);font-size:0.8rem;margin-bottom:14px">Manually add a booking on behalf of a customer or for internal use. It will appear as booked on the customer portal.</p>
+            <div id="addError" class="error-banner" style="display:none"></div>
+            <div id="addSuccess" class="success-banner" style="display:none"></div>
+            <div class="form-group">
+              <label>Added By (Staff Name) *</label>
+              <input type="text" id="addStaffName" placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label>Booking Type</label>
+              <select id="addType" onchange="toggleAddType()">
+                <option value="customer">Customer Booking (walk-in/phone)</option>
+                <option value="internal">Internal/Private Session</option>
+                <option value="open_play">Open Play</option>
+              </select>
+            </div>
+            <div id="addCustomerFields">
+              <div class="form-group"><label>Full Name *</label><input type="text" id="addName" placeholder="Customer name"></div>
+              <div class="form-group"><label>Phone Number *</label><input type="tel" id="addPhone" placeholder="09XX-XXX-XXXX"></div>
+            </div>
+            <div id="addInternalFields" style="display:none">
+              <div class="form-group"><label>Session Label *</label><input type="text" id="addLabel" placeholder="e.g. Staff Practice"></div>
+            </div>
+            <div id="addDayRowsContainer"></div>
+            <button type="button" onclick="addDayRow()" style="width:100%;padding:8px;margin-bottom:12px;background:var(--blue-pale);color:var(--blue);border:1.5px dashed var(--blue);border-radius:8px;cursor:pointer;font-size:0.83rem;font-weight:600">➕ Add Another Day</button>
+            <!-- Payment fields — shown for internal sessions -->
+            <div id="addPaymentSection" style="display:none;background:var(--purple-pale);border:1.5px solid #c4b5fd;border-radius:8px;padding:12px;margin-bottom:12px">
+              <div style="font-size:0.72rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">💳 Payment Details (Internal Session)</div>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom:8px">
+                  <label>Payment Method</label>
+                  <select id="addPaymentType">
+                    <option value="">— None / N/A —</option>
+                    <option value="cash">💵 Cash</option>
+                    <option value="gcash">📱 GCash</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:8px">
+                  <label>Payment Status</label>
+                  <select id="addPaymentStatus">
+                    <option value="">— Not set —</option>
+                    <option value="paid">✅ Paid</option>
+                    <option value="unpaid">⏳ Unpaid</option>
+                    <option value="has_balance">⚠️ Has Balance</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label>Receipt / Screenshot <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+                <div class="pay-upload-box" id="addPayUploadBox" onclick="document.getElementById('addPayFileInput').click()">
+                  <input type="file" id="addPayFileInput" accept="image/*" onchange="handleAddPayUpload(this)">
+                  <div id="addPayUploadLabel" style="font-size:0.82rem;color:var(--muted)">📎 Click to upload receipt</div>
+                  <img id="addPayPreviewImg" src="" style="display:none;max-width:100%;border-radius:6px;margin-top:6px">
+                </div>
+              </div>
+            </div>
+            <div class="form-group"><label>Notes</label><textarea id="addNotes" rows="2" placeholder="Optional notes..."></textarea></div>
+            <button class="btn-full" style="background:var(--blue);color:white" onclick="submitAdminBooking()">Add Booking</button>
+          </div>
+        </div>
+
+        <div class="panel" id="addDayPreviewPanel" style="display:none">
+          <div class="panel-header" style="background:var(--green)" id="addDayPreviewTitle">Day Availability</div>
+          <div class="panel-body">
+            <div id="addDaySlots" style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK -->
+    <div class="page" id="page-block">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header" style="background:#8b4000">🚫 Block a Time Slot</div>
+          <div class="panel-body">
+            <p style="color:var(--muted);font-size:0.8rem;margin-bottom:14px">Block slots for maintenance or closures. Blocked slots show as unavailable to customers.</p>
+            <div id="blockError" class="error-banner" style="display:none"></div>
+            <div class="form-group"><label>Date *</label><input type="date" id="blockDate" onchange="loadBlockSlots()"></div>
+            <div class="form-row">
+              <div class="form-group"><label>Start Time *</label><select id="blockStart"></select></div>
+              <div class="form-group"><label>End Time *</label><select id="blockEnd"></select></div>
+            </div>
+            <div class="form-group"><label>Reason / Label</label><input type="text" id="blockReason" placeholder="e.g. Maintenance"></div>
+            <button class="btn-full" style="background:#8b4000;color:white" onclick="createBlock()">Block This Time</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header" style="background:#8b4000;display:flex;align-items:center;justify-content:space-between">
+            <span>📋 Active Blocks</span>
+            <select id="blockViewMonth" onchange="loadActiveBlocks()" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:4px 8px;font-size:0.73rem;font-family:'DM Sans',sans-serif"></select>
+          </div>
+          <div class="panel-body" id="activeBlocksList"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="blockDayPreviewPanel" style="display:none">
+        <div class="panel-header" style="background:var(--green)" id="blockDayPreviewTitle">Day Availability</div>
+        <div class="panel-body">
+          <div id="blockDaySlots" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-family:'Bebas Neue',cursive;font-size:1.1rem;letter-spacing:1px;color:var(--green)">Recent Bookings</div>
+        <button class="btn-export" onclick="markAllRead()">✓ Mark all read</button>
+      </div>
+      <div id="notifList"><div class="loading"><span class="spinner"></span> Loading...</div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.06);max-width:480px">
+        <h3 style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--green);margin-bottom:6px">⚙️ Customer Booking Hours</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:18px">Set the time range customers can book on the public site.</p>
+        <div id="settingsError" class="error-banner" style="display:none"></div>
+        <div id="settingsSuccess" class="success-banner" style="display:none"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Open From</label><select id="settingsOpen"></select></div>
+          <div class="form-group"><label>Close At</label><select id="settingsClose"></select></div>
+        </div>
+        <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>
+
+      <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.06);max-width:520px;margin-top:20px">
+        <h3 style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:#dc2626;margin-bottom:6px">🗑️ Storage Management</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:16px">Remove stored receipt images to free up space. Booking records and all other details are always kept.</p>
+
+        <div style="padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid #f3f4f6">
+          <p style="font-size:0.82rem;font-weight:600;color:#374151;margin-bottom:8px">Emergency: Free All Storage</p>
+          <button id="cleanupBtn" class="btn-primary" style="background:#dc2626" onclick="cleanupStorage()">Free Up All Storage Now</button>
+          <p id="cleanupResult" style="margin-top:8px;font-size:0.84rem;font-weight:600"></p>
+        </div>
+
+        <p style="font-size:0.82rem;font-weight:600;color:#374151;margin-bottom:4px">Manage Receipts by Age</p>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:12px">Load receipts stored more than 14 days ago, select which ones to remove, or auto-delete all of them at once.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <button class="btn-primary" style="background:#d97706" onclick="loadOldReceipts()">Load Receipts (14+ days old)</button>
+          <button class="btn-primary" style="background:#dc2626" onclick="autoDeleteOldReceipts()">Auto-delete All 14+ Days</button>
+        </div>
+        <div id="receiptManagerWrap" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#fef2f2;border-radius:8px 8px 0 0;border:1px solid #fecaca;border-bottom:none">
+            <label style="font-size:0.82rem;display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600">
+              <input type="checkbox" id="selectAllReceipts" onchange="toggleSelectAllReceipts(this)"> Select All
+            </label>
+            <button class="btn-primary" style="background:#dc2626;padding:5px 14px;font-size:0.78rem" onclick="deleteSelectedReceipts()">Delete Selected</button>
+          </div>
+          <div id="receiptList" style="max-height:280px;overflow-y:auto;border:1px solid #fecaca;border-radius:0 0 8px 8px"></div>
+        </div>
+        <p id="receiptMgmtResult" style="margin-top:10px;font-size:0.84rem;font-weight:600"></p>
+      </div>
+    </div>
+
+    <!-- HERO & CAROUSEL -->
+    <div class="page" id="page-hero">
+      <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.06);max-width:620px">
+        <h3 style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--green);margin-bottom:6px">🖼 Hero Section & Carousel</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:18px">Choose how the top banner of your booking site looks. Upload custom photos or keep the defaults.</p>
+        <div id="heroError" class="error-banner" style="display:none"></div>
+        <div id="heroSuccess" class="success-banner" style="display:none"></div>
+
+        <div class="form-group">
+          <label>Display Mode</label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:0.87rem;font-weight:500;padding:10px 16px;border:2px solid var(--border);border-radius:8px;flex:1;min-width:130px" id="heroModeCarouselLabel">
+              <input type="radio" name="heroMode" value="carousel" id="heroModeCarousel" onchange="onHeroModeChange()"> 🎠 Carousel
+            </label>
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:0.87rem;font-weight:500;padding:10px 16px;border:2px solid var(--border);border-radius:8px;flex:1;min-width:130px" id="heroModeStaticLabel">
+              <input type="radio" name="heroMode" value="static" id="heroModeStatic" onchange="onHeroModeChange()"> 🖼 Single Photo
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" id="heroUseCustomGroup">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.87rem;font-weight:600">
+            <input type="checkbox" id="heroUseCustom" onchange="onHeroUseCustomChange()">
+            Use my own photos (uncheck to restore defaults)
+          </label>
+        </div>
+
+        <div id="heroImagesSection">
+          <div id="heroImagesLabel" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:8px"></div>
+          <div id="heroImageGrid" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px"></div>
+          <div class="pay-upload-box" id="heroUploadBox" onclick="document.getElementById('heroFileInput').click()">
+            <input type="file" id="heroFileInput" accept="image/*" multiple onchange="handleHeroImageUpload(this)">
+            <div style="font-size:0.82rem;color:var(--muted)" id="heroUploadHint">📎 Click to add photo</div>
+          </div>
+          <p style="font-size:0.75rem;color:var(--muted);margin-top:6px" id="heroUploadNote"></p>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-primary" onclick="saveHeroSettings()">💾 Save Changes</button>
+          <button class="btn-secondary" onclick="loadHeroSettings()">↩ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="page" id="page-banner">
+      <div class="card">
+        <h3 style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--green);margin-bottom:6px">📢 Promo Banner / Ad</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:18px">Upload a banner image that appears on the customer booking page — use it for promos, announcements, or ads. Supports any image format.</p>
+        <div id="bannerError" class="error-banner" style="display:none"></div>
+        <div id="bannerSuccess" class="success-banner" style="display:none"></div>
+
+        <div class="form-group">
+          <label class="form-label">Banner Status</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem;font-weight:500">
+            <input type="checkbox" id="bannerActive" style="width:16px;height:16px;accent-color:var(--green)">
+            Show banner on booking page
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Banner Image</label>
+          <div class="pay-upload-box" id="bannerUploadBox" onclick="document.getElementById('bannerFileInput').click()" style="cursor:pointer">
+            <input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerUpload(this)">
+            <div id="bannerUploadContent">
+              <div style="font-size:1.5rem;margin-bottom:6px">🖼️</div>
+              <div style="font-size:0.82rem;color:var(--muted)">Click to upload banner image<br><span style="font-size:0.72rem">Recommended: 1200×300px or wider</span></div>
+            </div>
+          </div>
+          <div id="bannerPreviewWrap" style="display:none;margin-top:10px">
+            <img id="bannerPreview" src="" alt="Banner preview" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+            <button onclick="clearBanner()" style="margin-top:6px;background:var(--red-pale);border:1px solid #fcc;color:var(--red);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.78rem">✕ Remove image</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Click-Through Link (optional)</label>
+          <input type="url" id="bannerLink" placeholder="https://your-promo-link.com" style="width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.86rem">
+          <p style="font-size:0.72rem;color:var(--muted);margin-top:4px">If set, tapping the banner opens this URL in a new tab.</p>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn-primary" onclick="saveBanner()">💾 Save Banner</button>
+          <button class="btn-secondary" onclick="loadBanner()">↩ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-export">
+      <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.06);max-width:500px">
+        <h3 style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--green);margin-bottom:6px">Export Bookings</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:18px">Download booking data as CSV.</p>
+        <div class="form-group"><label>Export Month</label><input type="month" id="exportMonth"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-export" onclick="exportCSV('month')">📥 Monthly Report</button>
+          <button class="btn-export" onclick="exportCSV('week')">📥 Weekly Report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header green">✏️ Edit Booking <span class="modal-close" onclick="closeModal('editModal')">✕</span></div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="form-group"><label>Name</label><input type="text" id="editName"></div>
+      <div class="form-group"><label>Phone</label><input type="tel" id="editPhone"></div>
+      <div class="form-group"><label>Date</label><input type="date" id="editDate"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Start Time</label><select id="editStart"></select></div>
+        <div class="form-group"><label>End Time</label><select id="editEnd"></select></div>
+      </div>
+      <div class="form-group"><label>Customer Notes <span style="color:var(--muted);font-weight:400;font-size:0.75rem">(read-only)</span></label>
+        <div id="editCustomerNotes" style="background:#f7f5f0;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:0.82rem;min-height:36px;color:#555;line-height:1.4"></div>
+      </div>
+      <div class="form-group"><label>Admin Notes <span style="color:var(--muted);font-weight:400;font-size:0.75rem">(private, staff only)</span></label>
+        <textarea id="editAdminNotes" rows="2" placeholder="Private notes visible to staff only…"></textarea>
+      </div>
+      <div class="form-group"><label>Booking Status</label>
+        <select id="editStatus" onchange="toggleEditHoldReason()">
+          <option value="confirmed">✓ Confirmed</option>
+          <option value="on_hold">⏸ On Hold</option>
+          <option value="cancelled">✗ Cancelled</option>
+        </select>
+      </div>
+      <div id="editHoldReasonGroup" class="form-group" style="display:none">
+        <label>Hold Reason <span style="color:var(--muted);font-weight:400;font-size:0.75rem">(visible to staff)</span></label>
+        <textarea id="editHoldReason" rows="2" placeholder="e.g. Rain, weather hold, rescheduling..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>🏓 Paddle Rental <span style="color:var(--muted);font-weight:400;font-size:0.75rem">(₱50 each)</span></label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="number" id="editPaddleQty" min="0" step="1" value="0" style="max-width:100px" oninput="updateEditPaddleTotal()">
+          <span id="editPaddleTotal" style="font-size:0.82rem;color:var(--muted);white-space:nowrap">= ₱0</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Payment Method</label>
+          <select id="editPaymentType">
+            <option value="">— None —</option>
+            <option value="cash">💵 Cash</option>
+            <option value="gcash">📱 GCash</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Payment Status</label>
+          <select id="editPaymentStatus">
+            <option value="">— Not set —</option>
+            <option value="paid">✅ Paid</option>
+            <option value="unpaid">⏳ Unpaid</option>
+            <option value="has_balance">⚠️ Has Balance</option>
+            <option value="refunded">↩️ Refunded</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Payment Screenshot</label>
+        <div id="editPayment"></div>
+        <div class="pay-upload-box" id="payUploadBox" onclick="document.getElementById('payFileInput').click()">
+          <input type="file" id="payFileInput" accept="image/*" onchange="handlePayUpload(this)">
+          <div id="payUploadLabel" style="font-size:0.82rem;color:var(--muted)">📎 Click to upload screenshot</div>
+          <img id="payPreviewImg" src="" style="display:none;max-width:100%;border-radius:6px;margin-top:6px">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- REBOOK MODAL -->
+<div class="modal-overlay" id="rebookModal">
+  <div class="modal">
+    <div class="modal-header amber">🔄 Rebook Slot <span class="modal-close" onclick="closeModal('rebookModal')">✕</span></div>
+    <div class="modal-body">
+      <input type="hidden" id="rebookId">
+      <input type="hidden" id="rebookOriginalDate">
+      <div class="success-banner" id="rebookOriginalInfo" style="margin-bottom:12px"></div>
+      <div class="form-group">
+        <label>Rebooked From (Original Date)</label>
+        <input type="text" id="rebookFromDisplay" readonly style="background:#f7f5f0;cursor:default;color:var(--muted);font-weight:600;">
+      </div>
+      <div class="form-group"><label>New Date</label><input type="date" id="rebookNewDate"></div>
+      <div class="form-row">
+        <div class="form-group"><label>New Start Time</label><select id="rebookStart"></select></div>
+        <div class="form-group"><label>New End Time</label><select id="rebookEnd"></select></div>
+      </div>
+      <div class="form-group">
+        <label>Rebook Note (optional)</label>
+        <textarea id="rebookNote" rows="2" placeholder="e.g. weather cancellation, schedule conflict…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('rebookModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveRebook()">Confirm Rebook</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal">
+    <div class="modal-header green">🏓 Booking Details <span class="modal-close" onclick="closeModal('viewModal')">✕</span></div>
+    <div class="modal-body" id="viewModalBody"></div>
+    <div class="modal-footer"><button class="btn-secondary" onclick="closeModal('viewModal')">Close</button></div>
+  </div>
+</div>
+
+<!-- HOLD MODAL -->
+<div class="modal-overlay" id="holdModal">
+  <div class="modal">
+    <div class="modal-header" style="background:var(--purple)">⏸ Put Booking On Hold <span class="modal-close" onclick="closeModal('holdModal')">✕</span></div>
+    <div class="modal-body">
+      <input type="hidden" id="holdBookingId">
+      <div id="holdBookingInfo" style="background:var(--purple-pale);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:0.83rem;color:var(--purple);font-weight:600"></div>
+      <div class="form-group">
+        <label>Reason for Hold <span style="color:var(--muted);font-weight:400;font-size:0.75rem">(required — e.g. rain, weather cancellation)</span></label>
+        <textarea id="holdReason" rows="3" placeholder="e.g. Rain — court closed until further notice&#10;Weather hold — will reschedule&#10;Holding request by client"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('holdModal')">Cancel</button>
+      <button class="btn-primary" style="background:var(--purple)" onclick="confirmHold()">⏸ Confirm Hold</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOLD ALL MODAL -->
+<div class="modal-overlay" id="holdAllModal">
+  <div class="modal">
+    <div class="modal-header" style="background:var(--purple)">⏸ Hold All Today's Bookings <span class="modal-close" onclick="closeModal('holdAllModal')">✕</span></div>
+    <div class="modal-body">
+      <div id="holdAllInfo" style="background:var(--purple-pale);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:0.83rem;color:var(--purple)"></div>
+      <div class="form-group">
+        <label>Reason for Hold <span style="color:var(--muted);font-weight:400;font-size:0.75rem">(applies to all today's bookings)</span></label>
+        <textarea id="holdAllReason" rows="3" placeholder="e.g. Rain — court closed today&#10;Weather hold for all sessions&#10;Facility issue"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('holdAllModal')">Cancel</button>
+      <button class="btn-primary" style="background:var(--purple)" onclick="confirmHoldAll()">⏸ Hold All Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='/api/bookings';
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_SHORT=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const OPEN_HOUR=13;
+const CLOSE_HOUR=23;
+const ADMIN_OPEN_HOUR=0;
+const ADMIN_CLOSE_HOUR=24;
+
+let adminPass='';
+let allBookings=[];
+let filteredBookings=[];
+let adminViewYear,adminViewMonth;
+let bkYear,bkMonth;
+let currentPage='dashboard';
+let dashFilter='today';
+let pendingPaymentData=null;
+let addPendingPaymentData=null;
+let editOriginalBooking=null;
+
+// ─── LOCAL DATE HELPER (fixes timezone bug) ────────────────
+function getLocalDateStr(d){
+  // Returns YYYY-MM-DD in local time (not UTC)
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ─── Login (now with real password verification) ───────────
+async function doLogin(){
+  const pass=document.getElementById('loginPass').value;
+  const errEl=document.getElementById('loginErr');
+  const input=document.getElementById('loginPass');
+  const btn=document.getElementById('loginBtn');
+
+  errEl.classList.remove('visible');
+  input.classList.remove('error');
+
+  if(!pass){
+    errEl.textContent='Please enter a password.';
+    errEl.classList.add('visible');
+    input.classList.add('error');
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent='Verifying...';
+
+  try{
+    const r=await fetch(API+'/verify',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({adminPassword:pass})
+    });
+
+    if(r.status===401){
+      errEl.innerHTML='❌ Wrong password. Please try again.';
+      errEl.classList.add('visible');
+      input.classList.add('error');
+      input.value='';
+      input.focus();
+      btn.disabled=false;
+      btn.textContent='Login';
+      return;
+    }
+
+    if(!r.ok){
+      errEl.textContent='Server error. Please try again.';
+      errEl.classList.add('visible');
+      btn.disabled=false;
+      btn.textContent='Login';
+      return;
+    }
+
+    // Success
+    adminPass=pass;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').classList.add('visible');
+    initAdmin();
+  }catch(e){
+    errEl.textContent='Network error. Please check your connection.';
+    errEl.classList.add('visible');
+    btn.disabled=false;
+    btn.textContent='Login';
+  }
+}
+
+let addDayRows=[];
+let lastSeenAt=localStorage.getItem('dinkanddirt_admin_last_seen')||new Date(0).toISOString();
+
+function initAdmin(){
+  const now=new Date();
+  adminViewYear=now.getFullYear();
+  adminViewMonth=now.getMonth();
+  bkYear=now.getFullYear();
+  bkMonth=now.getMonth();
+  const em=document.getElementById('exportMonth');
+  if(em)em.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  populateHourSelects(['blockStart','blockEnd','editStart','editEnd']);
+  populateSettingsSelects();
+  document.getElementById('blockDate').value=getLocalDateStr(now);
+  initBlockMonthSelector();
+  initAddDayRows();
+  loadDashboard();
+  renderAdminCal();
+  loadBookingsPage();
+  loadAdminSettings();
+
+  loadOnHoldBookings();
+  let _dashTimer=null,_notifTimer=null;
+  function startAdminPolling(){
+    if(!_dashTimer)_dashTimer=setInterval(()=>{if(currentPage==='dashboard'){loadDashboard();}else{loadOnHoldBookings();}},30000);
+    if(!_notifTimer)_notifTimer=setInterval(pollNotifications,30000);
+  }
+  function stopAdminPolling(){
+    clearInterval(_dashTimer);clearInterval(_notifTimer);
+    _dashTimer=null;_notifTimer=null;
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden)stopAdminPolling();else startAdminPolling();
+  });
+  startAdminPolling();
+  pollNotifications();
+}
+
+// ─── Sidebar mobile ────────────────────────────────────────
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarBackdrop').classList.add('visible');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('visible');
+}
+
+// ─── Page Navigation ───────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  const labels={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',banner:'Promo Banner'};
+  document.getElementById('pageTitle').textContent=labels[name]||name;
+  currentPage=name;
+
+  const navMap={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',banner:'Promo Banner'};
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(navMap[name]&&n.textContent.includes(navMap[name]))n.classList.add('active');
+  });
+
+  closeSidebar();
+
+  if(name==='dashboard'){loadDashboard();}
+  if(name==='calendar')renderAdminCal();
+  if(name==='bookings')loadBookingsPage();
+  if(name==='block'){initBlockMonthSelector();loadActiveBlocks();}
+  if(name==='add')renderAddDayRows();
+  if(name==='notifications'){markAllRead();loadNotifications();}
+  if(name==='settings')loadAdminSettings();
+  if(name==='hero')loadHeroSettings();
+  if(name==='banner')loadBanner();
+}
+
+function refreshAll(){
+  if(currentPage==='dashboard')loadDashboard();
+  if(currentPage==='calendar')renderAdminCal();
+  if(currentPage==='bookings')loadBookingsPage();
+  if(currentPage==='block')loadActiveBlocks();
+}
+
+// ─── Helpers ───────────────────────────────────────────────
+function formatHour(h){
+  if(h===24)return 'Midnight';
+  const hrs=Math.floor(h),mins=h%1===0.5?'30':'00',period=hrs<12?'AM':'PM';
+  const display=hrs>12?hrs-12:(hrs===0?12:hrs);
+  return `${display}:${mins} ${period}`;
+}
+function formatDate(dateStr){
+  const[y,m,d]=dateStr.split('-');
+  return new Date(y,m-1,d).toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+}
+async function fetchBookings(month){
+  const r=await fetch(`${API}?month=${month}`);
+  const d=await r.json();
+  return d.bookings||[];
+}
+function populateHourSelects(ids){
+  ids.forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel)return;
+    sel.innerHTML='';
+    let h=ADMIN_OPEN_HOUR;
+    while(h<=ADMIN_CLOSE_HOUR){
+      const opt=document.createElement('option');
+      opt.value=h;opt.textContent=formatHour(h);
+      sel.appendChild(opt);h+=1;
+    }
+  });
+  const bs=document.getElementById('blockStart');if(bs)bs.value=OPEN_HOUR;
+  const be=document.getElementById('blockEnd');if(be)be.value=OPEN_HOUR+1;
+}
+
+function populateHourSelect(sel,defaultVal){
+  sel.innerHTML='';
+  let h=ADMIN_OPEN_HOUR;
+  while(h<=ADMIN_CLOSE_HOUR){
+    const opt=document.createElement('option');
+    opt.value=h;opt.textContent=formatHour(h);
+    sel.appendChild(opt);h+=1;
+  }
+  sel.value=defaultVal;
+}
+
+function populateSettingsSelects(){
+  const openSel=document.getElementById('settingsOpen');
+  const closeSel=document.getElementById('settingsClose');
+  if(!openSel||!closeSel)return;
+  openSel.innerHTML='';closeSel.innerHTML='';
+  for(let h=0;h<=23;h++){
+    const opt=document.createElement('option');
+    opt.value=h;opt.textContent=formatHour(h);
+    openSel.appendChild(opt);
+  }
+  for(let h=1;h<=24;h++){
+    const opt=document.createElement('option');
+    opt.value=h;opt.textContent=formatHour(h);
+    closeSel.appendChild(opt);
+  }
+  openSel.value=OPEN_HOUR;
+  closeSel.value=CLOSE_HOUR;
+}
+function getPaymentStatusLabel(ps){
+  if(ps==='paid')return '✅ Paid';
+  if(ps==='unpaid')return '⏳ Unpaid';
+  if(ps==='has_balance')return '⚠️ Has Balance';
+  if(ps==='refunded')return '↩️ Refunded';
+  return ps;
+}
+
+function getPaymentBadge(b){
+  if(b.type==='block')return `<span class="badge" style="background:#eee;color:#999">N/A</span>`;
+  const ps=b.paymentStatus;
+  const pt=b.paymentType;
+  const methodTag=pt==='cash'?' · 💵':pt==='gcash'?' · 📱':'';
+  if(ps==='paid')return `<span class="badge badge-green">✅ Paid${methodTag}</span>`;
+  if(ps==='unpaid')return `<span class="badge badge-yellow">⏳ Unpaid${methodTag}</span>`;
+  if(ps==='has_balance')return `<span class="badge" style="background:#fff0e0;color:#b45309;border:1px solid #fcd34d">⚠️ Has Balance${methodTag}</span>`;
+  if(ps==='refunded')return `<span class="badge" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe">↩️ Refunded${methodTag}</span>`;
+  return b.hasPayment?`<span class="badge badge-green">✓ Screenshot</span>`:`<span class="badge badge-yellow">⏳ Pending</span>`;
+}
+
+function escapeHtml(str){
+  const div=document.createElement('div');
+  div.textContent=str;
+  return div.innerHTML;
+}
+
+function getStatusBadge(b){
+  if(b.status==='confirmed')return `<span class="badge badge-green">✓ Confirmed</span>`;
+  if(b.status==='on_hold')return `<span class="badge badge-purple">⏸ On Hold</span>`;
+  return `<span class="badge badge-red">✗ Cancelled</span>`;
+}
+function getStatusBadgeShort(b){
+  if(b.status==='confirmed')return `<span class="badge badge-green">✓</span>`;
+  if(b.status==='on_hold')return `<span class="badge badge-purple">⏸</span>`;
+  return `<span class="badge badge-red">✗</span>`;
+}
+
+function getTypeBadge(b){
+  if(b.type==='block')return `<span class="type-tag type-block">🚫 Block</span>`;
+  if(b.type==='internal')return `<span class="type-tag type-internal">🔵 Internal</span>`;
+  if(b.type==='open_play')return `<span class="type-tag type-internal">🏓 Open Play</span>`;
+  return `<span class="type-tag type-customer">🟢 Customer</span>`;
+}
+
+// ─── Dashboard filter ──────────────────────────────────────
+function setDashFilter(f){
+  dashFilter=f;
+  ['yesterday','today','tomorrow'].forEach(k=>{
+    document.getElementById(`dashBtn${k.charAt(0).toUpperCase()+k.slice(1)}`).classList.toggle('active',k===f);
+  });
+  loadDashboard();
+}
+
+// ─── Dashboard (FIXED with local date) ─────────────────────
+async function loadDashboard(){
+  const now=new Date();
+  const offset=dashFilter==='yesterday'?-1:dashFilter==='tomorrow'?1:0;
+  const target=new Date(now.getFullYear(),now.getMonth(),now.getDate()+offset);
+  const targetStr=getLocalDateStr(target);
+  const month=`${target.getFullYear()}-${String(target.getMonth()+1).padStart(2,'0')}`;
+  const todayStr=getLocalDateStr(now);
+
+  const labelMap={yesterday:'Yesterday',today:'Today',tomorrow:'Tomorrow'};
+  document.getElementById('dashScheduleLabel').innerHTML=
+    `${labelMap[dashFilter]}'s Schedule (<span id="todayDateLabel">${target.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric'})}</span>)`;
+
+  document.getElementById('todayBookings').innerHTML='<div class="loading"><span class="spinner"></span> Loading...</div>';
+  document.getElementById('todayBookingsMobile').innerHTML='<div class="loading"><span class="spinner"></span> Loading...</div>';
+
+  let bookings=[];
+  try{
+    bookings=await fetchBookings(month);
+  }catch(e){
+    console.error('Error fetching bookings:',e);
+    document.getElementById('todayBookings').innerHTML='<div class="no-data"><div class="big">⚠️</div>Error loading bookings</div>';
+    return;
+  }
+
+  const targetBks=bookings.filter(b=>b.date===targetStr&&b.status!=='cancelled');
+  // Stats always show today
+  const todayBks=bookings.filter(b=>b.date===todayStr&&b.status!=='cancelled');
+  const allMonthBks=await fetchBookings(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`);
+  const monthBks=allMonthBks.filter(b=>b.status!=='cancelled');
+  const dayOfWeek=now.getDay();
+  const weekStart=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dayOfWeek);
+  const weekEnd=new Date(weekStart.getFullYear(),weekStart.getMonth(),weekStart.getDate()+6);
+  const weekBks=allMonthBks.filter(b=>{
+    const[y,m,d]=b.date.split('-');
+    const bd=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+    return bd>=weekStart&&bd<=weekEnd&&b.status!=='cancelled';
+  });
+
+  document.getElementById('statToday').textContent=todayBks.length;
+  document.getElementById('statMonth').textContent=monthBks.length;
+  document.getElementById('statWeek').textContent=weekBks.length;
+  document.getElementById('statHours').textContent=todayBks.reduce((s,b)=>s+(b.endHour-b.startHour),0);
+
+  renderBookings(targetBks,'todayBookings','todayBookingsMobile',dashFilter==='today');
+  loadOnHoldBookings();
+}
+
+// ─── Admin Calendar ────────────────────────────────────────
+async function renderAdminCal(){
+  document.getElementById('adminCalLabel').textContent=`${MONTHS[adminViewMonth]} ${adminViewYear}`;
+  const month=`${adminViewYear}-${String(adminViewMonth+1).padStart(2,'0')}`;
+  const bookings=await fetchBookings(month);
+  const byDate={};
+  bookings.forEach(b=>{if(!byDate[b.date])byDate[b.date]=[];byDate[b.date].push(b);});
+  const calEl=document.getElementById('adminCal');
+  let html=`<div class="admin-cal-header">`;
+  DAYS_SHORT.forEach(d=>html+=`<div>${d}</div>`);
+  html+=`</div><div class="admin-cal-grid">`;
+  const firstDay=new Date(adminViewYear,adminViewMonth,1).getDay();
+  const daysInMonth=new Date(adminViewYear,adminViewMonth+1,0).getDate();
+  const today=new Date();
+  for(let i=0;i<firstDay;i++)html+=`<div class="admin-cal-cell empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${adminViewYear}-${String(adminViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=d===today.getDate()&&adminViewMonth===today.getMonth()&&adminViewYear===today.getFullYear();
+    const dayBks=byDate[dateStr]||[];
+    const activeBks=dayBks.filter(b=>b.status!=='cancelled');
+    html+=`<div class="admin-cal-cell${isToday?' today':''}" onclick="showCalDay('${dateStr}')"><div class="cell-date">${d}</div>`;
+    activeBks.slice(0,3).forEach(b=>{
+      let cls='customer';
+      if(b.type==='block')cls='blocked';
+      else if(b.type==='internal'||b.type==='open_play')cls='internal';
+      html+=`<div class="cell-booking ${cls}" title="${b.name}">${formatHour(b.startHour)} ${b.name.split(' ')[0]}</div>`;
+    });
+    if(dayBks.length>3)html+=`<div class="cell-more">+${dayBks.length-3} more</div>`;
+    html+=`<div class="cell-dots">`;
+    activeBks.slice(0,6).forEach(b=>{
+      let cls='customer';
+      if(b.type==='block')cls='blocked';
+      else if(b.type==='internal'||b.type==='open_play')cls='internal';
+      html+=`<div class="cell-dot ${cls}" title="${b.name}"></div>`;
+    });
+    if(activeBks.length>6)html+=`<div class="cell-more-dot">+${activeBks.length-6}</div>`;
+    html+=`</div></div>`;
+  }
+  html+=`</div>`;
+  calEl.innerHTML=html;
+  document.getElementById('calDayDetail').style.display='none';
+}
+function calPrevMonth(){adminViewMonth--;if(adminViewMonth<0){adminViewMonth=11;adminViewYear--;}renderAdminCal();}
+function calNextMonth(){adminViewMonth++;if(adminViewMonth>11){adminViewMonth=0;adminViewYear++;}renderAdminCal();}
+async function showCalDay(dateStr){
+  const month=dateStr.slice(0,7);
+  const bookings=await fetchBookings(month);
+  const dayBks=bookings.filter(b=>b.date===dateStr);
+  document.getElementById('calDayTitle').textContent=`📅 ${formatDate(dateStr)}`;
+  renderBookings(dayBks,'calDayTable','calDayMobile');
+  document.getElementById('calDayDetail').style.display='block';
+  document.getElementById('calDayDetail').scrollIntoView({behavior:'smooth'});
+}
+
+// ─── Bookings Page ─────────────────────────────────────────
+let bkMode='month'; // 'month' | 'all'
+
+function initBkMonthJump(){
+  const sel=document.getElementById('bkMonthJump');
+  sel.innerHTML='';
+  const now=new Date();
+  // Offer 12 months back through 3 months ahead
+  for(let i=-12;i<=3;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+    const val=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const opt=document.createElement('option');
+    opt.value=val;
+    opt.textContent=`${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    if(d.getFullYear()===bkYear&&d.getMonth()===bkMonth)opt.selected=true;
+    sel.appendChild(opt);
+  }
+}
+
+function bkJumpToMonth(val){
+  if(!val)return;
+  const[y,m]=val.split('-');
+  bkYear=parseInt(y);bkMonth=parseInt(m)-1;
+  setBkMode('month');
+}
+
+function setBkMode(mode){
+  bkMode=mode;
+  document.getElementById('bkFilterMonth').classList.toggle('active',mode==='month');
+  document.getElementById('bkFilterAll').classList.toggle('active',mode==='all');
+  document.getElementById('bkPeriodNav').style.display=mode==='month'?'flex':'none';
+  loadBookingsPage();
+}
+
+async function loadBookingsPage(){
+  document.getElementById('bookingsTable').innerHTML=`<div class="loading"><span class="spinner"></span> Loading...</div>`;
+  document.getElementById('bookingsMobile').innerHTML='';
+  initBkMonthJump();
+
+  if(bkMode==='month'){
+    const month=`${bkYear}-${String(bkMonth+1).padStart(2,'0')}`;
+    document.getElementById('bkMonthLabel').textContent=`${MONTHS[bkMonth]} ${bkYear}`;
+    allBookings=await fetchBookings(month);
+  } else {
+    // All time: load 12 months back through 3 months ahead
+    const note=document.getElementById('bkLoadingNote');
+    note.style.display='inline-flex';
+    const now=new Date();
+    const months=[];
+    for(let i=-12;i<=3;i++){
+      const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+      months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+    let combined=[];
+    for(const m of months){const bks=await fetchBookings(m);combined=combined.concat(bks);}
+    const seen=new Set();
+    allBookings=combined.filter(b=>{if(seen.has(b.id))return false;seen.add(b.id);return true;});
+    note.style.display='none';
+  }
+  filterBookings();
+}
+function bkPrevMonth(){bkMonth--;if(bkMonth<0){bkMonth=11;bkYear--;}loadBookingsPage();}
+function bkNextMonth(){bkMonth++;if(bkMonth>11){bkMonth=0;bkYear++;}loadBookingsPage();}
+function filterBookings(){
+  const q=document.getElementById('searchFilter').value.toLowerCase();
+  filteredBookings=allBookings.filter(b=>!q||b.name.toLowerCase().includes(q)||(b.phone||'').toLowerCase().includes(q));
+  renderBookings(filteredBookings,'bookingsTable','bookingsMobile');
+}
+
+// ─── Render Bookings (table + mobile cards) ────────────────
+function renderBookings(bookings,tableId,mobileId,isToday=false){
+  const tableEl=document.getElementById(tableId);
+  const mobileEl=document.getElementById(mobileId);
+
+  if(!bookings.length){
+    const empty=`<div class="no-data"><div class="big">${isToday?'😴':'📭'}</div>${isToday?'No bookings for today':'No bookings found'}</div>`;
+    tableEl.innerHTML=empty;
+    mobileEl.innerHTML=empty;
+    return;
+  }
+
+  // Table view (desktop)
+  let html=`<table><thead><tr><th>Type</th><th>Date</th><th>Time</th><th>Hrs</th><th>Amount</th><th>Name</th><th>Phone</th><th>Status</th><th>Payment</th><th>Actions</th></tr></thead><tbody>`;
+  bookings.forEach(b=>{
+    const hrs=b.endHour-b.startHour;
+    const amount=b.type==='block'?'—':`₱${(hrs*250).toLocaleString()}`;
+    const statusBadge=getStatusBadgeShort(b);
+    const payBadge=getPaymentBadge(b);
+    const canView=b.type!=='block';
+    const canRebook=b.type!=='block';
+    const rebookBadge=b.rebookedFrom?`<span class="badge-rebook">🔄 from ${formatDate(b.rebookedFrom)}</span>`:'';
+    const rebookNote=b.rebookNote?`<div style="font-size:0.68rem;color:var(--muted);margin-top:2px;font-style:italic">${b.rebookNote}</div>`:'';
+    const holdNote=b.holdReason?`<div style="font-size:0.68rem;color:var(--purple);margin-top:2px">⏸ ${b.holdReason}</div>`:'';
+    const canHold=b.status!=='cancelled'&&b.type!=='block';
+    const paddleNote=b.paddleQty>0?`<div class="paddle-note">🏓 +${b.paddleQty} paddle${b.paddleQty>1?'s':''} (₱${b.paddleQty*50})</div>`:'';
+    html+=`<tr${b.status==='on_hold'?' style="background:#faf5ff"':''}>
+      <td>${getTypeBadge(b)}${b.bookedByAdmin?`<span class="badge-admin-added" title="Added by staff">🛠 ${escapeHtml(b.addedByName||'Admin')}</span>`:''}</td>
+      <td>${formatDate(b.date)}${rebookBadge}${rebookNote}${holdNote}</td>
+      <td>${formatHour(b.startHour)} – ${formatHour(b.endHour)}</td>
+      <td>${hrs}h</td>
+      <td><strong>${amount}</strong>${paddleNote}</td>
+      <td><strong>${b.name}</strong></td>
+      <td>${b.phone||'—'}</td>
+      <td>${statusBadge}</td>
+      <td>${payBadge}</td>
+      <td><div class="action-btns">
+        ${canView?`<button class="btn-sm btn-view" onclick="viewBooking('${b.id}')">👁</button>`:''}
+        ${canRebook?`<button class="btn-sm btn-rebook" onclick="openRebook('${b.id}')" title="Rebook to a new date/time">🔄</button>`:''}
+        <button class="btn-sm btn-edit" onclick="editBooking('${b.id}')">✏️</button>
+        ${canHold&&b.status!=='on_hold'?`<button class="btn-sm btn-hold" onclick="openHoldModal('${b.id}')" title="Put on hold">⏸</button>`:''}
+        ${b.status==='on_hold'?`<button class="btn-sm btn-hold" onclick="openHoldModal('${b.id}')" title="Update hold reason" style="opacity:0.7">⏸✏</button>`:''}
+        ${b.status!=='cancelled'?`<button class="btn-sm btn-cancel" onclick="cancelBooking('${b.id}')">✕</button>`:''}
+        <button class="btn-sm btn-delete" onclick="deleteBooking('${b.id}')">🗑</button>
+      </div></td>
+    </tr>`;
+  });
+  html+=`</tbody></table>`;
+  tableEl.innerHTML=html;
+
+  // Mobile cards
+  let mob='';
+  bookings.forEach(b=>{
+    const hrs=b.endHour-b.startHour;
+    const amount=b.type==='block'?'—':`₱${(hrs*250).toLocaleString()}`;
+    const statusBadge=getStatusBadge(b);
+    const payBadge=getPaymentBadge(b);
+    const canView=b.type!=='block';
+    const canRebook=b.type!=='block';
+    const canHold=b.status!=='cancelled'&&b.type!=='block';
+    const rebookBadge=b.rebookedFrom?`<span class="badge-rebook">🔄 from ${formatDate(b.rebookedFrom)}</span>`:'';
+    mob+=`<div class="mob-card"${b.status==='on_hold'?' style="border-left:3px solid var(--purple)"':''}>
+      <div class="mob-card-top">
+        <div>
+          <div class="mob-card-name">${b.name}</div>
+          <div style="margin-top:4px">${getTypeBadge(b)} ${statusBadge}${b.bookedByAdmin?`<span class="badge-admin-added" title="Added by staff">🛠 ${escapeHtml(b.addedByName||'Admin')}</span>`:''}</div>
+        </div>
+      </div>
+      ${b.holdReason?`<div style="background:var(--purple-pale);border-radius:6px;padding:5px 9px;font-size:0.75rem;color:var(--purple);margin-bottom:6px">⏸ <strong>Hold:</strong> ${b.holdReason}</div>`:''}
+      <div class="mob-card-row"><span>📅 Date</span><strong>${formatDate(b.date)} ${rebookBadge}</strong></div>
+      ${b.rebookNote?`<div class="mob-card-row"><span>🔄 Note</span><em style="font-size:0.78rem;color:var(--muted)">${b.rebookNote}</em></div>`:''}
+      <div class="mob-card-row"><span>⏰ Time</span><strong>${formatHour(b.startHour)} – ${formatHour(b.endHour)} (${hrs}h)</strong></div>
+      <div class="mob-card-row"><span>📞 Phone</span><strong>${b.phone||'—'}</strong></div>
+      <div class="mob-card-row"><span>💰 Amount</span><strong>${amount}</strong></div>
+      ${b.paddleQty>0?`<div class="mob-card-row"><span>🏓 Paddle Rental</span><strong>${b.paddleQty} × ₱50 = ₱${b.paddleQty*50}</strong></div>`:''}
+      <div class="mob-card-row"><span>💳 Payment</span>${payBadge}</div>
+      <div class="mob-card-actions">
+        ${canView?`<button class="btn-sm btn-view" onclick="viewBooking('${b.id}')">👁 View</button>`:''}
+        ${canRebook?`<button class="btn-sm btn-rebook" onclick="openRebook('${b.id}')">🔄 Rebook</button>`:''}
+        <button class="btn-sm btn-edit" onclick="editBooking('${b.id}')">✏️ Edit</button>
+        ${canHold?`<button class="btn-sm btn-hold" onclick="openHoldModal('${b.id}')">⏸ Hold</button>`:''}
+        ${b.status!=='cancelled'?`<button class="btn-sm btn-cancel" onclick="cancelBooking('${b.id}')">✕ Cancel</button>`:''}
+        <button class="btn-sm btn-delete" onclick="deleteBooking('${b.id}')">🗑 Delete</button>
+      </div>
+    </div>`;
+  });
+  mobileEl.innerHTML=mob;
+}
+
+// ─── View ──────────────────────────────────────────────────
+async function viewBooking(id){
+  const r=await fetch(`${API}/${id}?admin=${encodeURIComponent(adminPass)}`);
+  const {booking}=await r.json();
+  if(!booking)return;
+  let html=`<div style="display:grid;gap:0">`;
+  const rows=[
+    ['Type',booking.type==='internal'?'🔵 Internal':'🟢 Customer'],
+    ['Name',booking.name],['Phone',booking.phone||'—'],
+    ['Date',formatDate(booking.date)],
+    ['Time',`${formatHour(booking.startHour)} – ${formatHour(booking.endHour)}`],
+    ['Duration',`${booking.endHour-booking.startHour}h`],
+    ...(booking.type!=='block'?[['Court Fee',`₱${((booking.endHour-booking.startHour)*250).toLocaleString()}`]]:[]),
+    ...(booking.paddleQty>0?[['Paddle Rental',`${booking.paddleQty} × ₱50 = ₱${booking.paddleQty*50}`]]:[]),
+    ...(booking.type!=='block'&&booking.paddleQty>0?[['Total Amount Due',`₱${((booking.endHour-booking.startHour)*250+booking.paddleQty*50).toLocaleString()}`]]:[]),
+    ...(booking.bookedByAdmin?[['Added By',`🛠 ${escapeHtml(booking.addedByName||'Admin')} (manual entry)`]]:[]),
+    ['Booking Status',booking.status==='on_hold'?'⏸ On Hold':booking.status==='confirmed'?'✓ Confirmed':'✗ Cancelled'],
+    ...(booking.holdReason?[['Hold Reason',`⏸ ${booking.holdReason}`]]:[]),
+    ...(booking.paymentType?[['Payment Method',booking.paymentType==='cash'?'💵 Cash':'📱 GCash']]:[]),
+    ...(booking.paymentStatus?[['Payment Status',getPaymentStatusLabel(booking.paymentStatus)]]:[]),
+    ['Booked on',new Date(booking.createdAt).toLocaleString('en-PH')],
+  ];
+  if(booking.notes)rows.push(['Customer Notes',booking.notes]);
+  if(booking.adminNotes)rows.push(['Admin Notes',`🔒 ${booking.adminNotes}`]);
+  if(booking.rebookedFrom)rows.push(['Rebooked From',`🔄 ${formatDate(booking.rebookedFrom)}`]);
+  if(booking.rebookNote)rows.push(['Rebook Note',booking.rebookNote]);
+  rows.forEach(([k,v])=>{
+    html+=`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);gap:10px"><span style="color:var(--muted);font-size:0.8rem">${k}</span><strong style="text-align:right;max-width:60%;font-size:0.85rem">${v}</strong></div>`;
+  });
+  html+=`</div>`;
+  if(booking.paymentData){
+    html+=`<div style="margin-top:14px"><div style="font-size:0.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Payment Screenshot</div><img src="${booking.paymentData}" class="payment-img"></div>`;
+  }else if(booking.type!=='block'&&booking.type!=='internal'){
+    html+=`<div style="margin-top:14px;padding:11px;background:#fff9e0;border-radius:8px;font-size:0.8rem;color:var(--yellow-dark)">⚠️ No payment screenshot</div>`;
+  }
+  document.getElementById('viewModalBody').innerHTML=html;
+  document.getElementById('viewModal').classList.add('open');
+}
+
+// ─── Edit ──────────────────────────────────────────────────
+async function editBooking(id){
+  const r=await fetch(`${API}/${id}?admin=${encodeURIComponent(adminPass)}`);
+  const {booking}=await r.json();
+  if(!booking)return;
+  editOriginalBooking=booking;
+  populateHourSelects(['editStart','editEnd']);
+  document.getElementById('editId').value=id;
+  document.getElementById('editName').value=booking.name;
+  document.getElementById('editPhone').value=booking.phone||'';
+  document.getElementById('editDate').value=booking.date;
+  document.getElementById('editStart').value=booking.startHour;
+  document.getElementById('editEnd').value=booking.endHour;
+  document.getElementById('editCustomerNotes').textContent=booking.notes||'(no customer notes)';
+  document.getElementById('editAdminNotes').value=booking.adminNotes||'';
+  document.getElementById('editStatus').value=booking.status;
+  document.getElementById('editHoldReason').value=booking.holdReason||'';
+  toggleEditHoldReason();
+  document.getElementById('editPaddleQty').value=booking.paddleQty||0;
+  updateEditPaddleTotal();
+  document.getElementById('editPaymentType').value=booking.paymentType||'';
+  document.getElementById('editPaymentStatus').value=booking.paymentStatus||'';
+  pendingPaymentData=null;
+  document.getElementById('payFileInput').value='';
+  const payEl=document.getElementById('editPayment');
+  const payBox=document.getElementById('payUploadBox');
+  const payPreview=document.getElementById('payPreviewImg');
+  const payLabel=document.getElementById('payUploadLabel');
+  payPreview.style.display='none';
+  if(booking.type==='block'){
+    payEl.innerHTML=''; payBox.style.display='none';
+  } else {
+    payBox.style.display='block';
+    if(booking.paymentData){
+      payEl.innerHTML=`<div style="font-size:0.8rem;color:var(--green);margin-bottom:4px">✓ Screenshot on file</div><img src="${booking.paymentData}" class="payment-img" style="margin-bottom:4px">`;
+      payLabel.textContent='📎 Replace screenshot';
+    } else {
+      payEl.innerHTML=`<div style="font-size:0.8rem;color:var(--yellow-dark);margin-bottom:4px">⚠️ No screenshot yet</div>`;
+      payLabel.textContent='📎 Upload screenshot';
+    }
+  }
+  document.getElementById('editModal').classList.add('open');
+}
+
+async function saveEdit(){
+  const id=document.getElementById('editId').value;
+  const startHour=parseFloat(document.getElementById('editStart').value);
+  const endHour=parseFloat(document.getElementById('editEnd').value);
+  if(endHour<=startHour)return alert('End time must be after start time.');
+  const newDate=document.getElementById('editDate').value;
+  let newStatus=document.getElementById('editStatus').value;
+  let holdReason=newStatus==='on_hold'?(document.getElementById('editHoldReason').value.trim()||null):null;
+  // Auto-confirm: if the booking was on hold and the date or time changed, lift the hold
+  if(editOriginalBooking&&editOriginalBooking.status==='on_hold'){
+    const dateChanged=newDate!==editOriginalBooking.date;
+    const timeChanged=startHour!==editOriginalBooking.startHour||endHour!==editOriginalBooking.endHour;
+    if(dateChanged||timeChanged){
+      newStatus='confirmed';
+      holdReason=null;
+      // Sync the status dropdown so the UI reflects what was saved
+      document.getElementById('editStatus').value='confirmed';
+      document.getElementById('editHoldReasonGroup').style.display='none';
+    }
+  }
+  const body={
+    adminPassword:adminPass,
+    name:document.getElementById('editName').value.trim(),
+    phone:document.getElementById('editPhone').value.trim(),
+    date:newDate,
+    startHour,endHour,
+    adminNotes:document.getElementById('editAdminNotes').value.trim(),
+    status:newStatus,
+    holdReason,
+    paymentType:document.getElementById('editPaymentType').value||null,
+    paymentStatus:document.getElementById('editPaymentStatus').value||null,
+    paddleQty:Math.max(0,parseInt(document.getElementById('editPaddleQty').value,10)||0),
+  };
+  if(pendingPaymentData)body.paymentData=pendingPaymentData;
+  const r=await fetch(`${API}/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json();
+  if(!r.ok)return alert(d.error||'Error saving.');
+  closeModal('editModal');
+  refreshAll();
+}
+
+async function openRebook(id){
+  const r=await fetch(`${API}/${id}?admin=${encodeURIComponent(adminPass)}`);
+  const {booking}=await r.json();
+  if(!booking)return;
+  populateHourSelects(['rebookStart','rebookEnd']);
+  document.getElementById('rebookId').value=id;
+  // The "rebooked from" date is the booking's current date (what we're replacing)
+  // If it was already rebooked, keep the earliest original date
+  const originalDate=booking.rebookedFrom||booking.date;
+  document.getElementById('rebookOriginalDate').value=originalDate;
+  document.getElementById('rebookFromDisplay').value=formatDate(originalDate);
+  document.getElementById('rebookNewDate').value=booking.date;
+  document.getElementById('rebookStart').value=booking.startHour;
+  document.getElementById('rebookEnd').value=booking.endHour;
+  document.getElementById('rebookNote').value='';
+  document.getElementById('rebookOriginalInfo').innerHTML=
+    `<strong>${booking.name}</strong> &nbsp;·&nbsp; ${formatDate(booking.date)} &nbsp;·&nbsp; ${formatHour(booking.startHour)}–${formatHour(booking.endHour)}`;
+  document.getElementById('rebookModal').classList.add('open');
+}
+
+async function saveRebook(){
+  const id=document.getElementById('rebookId').value;
+  const newDate=document.getElementById('rebookNewDate').value;
+  const startHour=parseFloat(document.getElementById('rebookStart').value);
+  const endHour=parseFloat(document.getElementById('rebookEnd').value);
+  const rebookNote=document.getElementById('rebookNote').value.trim();
+  const originalDate=document.getElementById('rebookOriginalDate').value;
+  if(!newDate)return alert('Please select a new date.');
+  if(endHour<=startHour)return alert('End time must be after start time.');
+  const body={
+    adminPassword:adminPass,
+    date:newDate,
+    startHour,endHour,
+    rebookedFrom:originalDate,
+    rebookNote:rebookNote||null,
+    isRebook:true,
+    // Always lift hold when rebooking to a new date/time
+    status:'confirmed',
+    holdReason:null,
+  };
+  const r=await fetch(`${API}/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json();
+  if(!r.ok)return alert(d.error||'Error rebooking. The new slot may conflict with an existing booking.');
+  closeModal('rebookModal');
+  refreshAll();
+}
+
+function compressImage(file){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1024;
+      let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg',0.7));
+    };
+    img.src=URL.createObjectURL(file);
+  });
+}
+
+async function handlePayUpload(input){
+  const file=input.files[0];
+  if(!file)return;
+  document.getElementById('payUploadLabel').textContent='Processing...';
+  try{
+    pendingPaymentData=await compressImage(file);
+    const img=document.getElementById('payPreviewImg');
+    img.src=pendingPaymentData;img.style.display='block';
+    document.getElementById('payUploadLabel').textContent='✓ Screenshot selected';
+  }catch(err){
+    document.getElementById('payUploadLabel').textContent='Failed to process image. Try again.';
+  }
+}
+
+async function cleanupStorage(){
+  if(!confirm('This will permanently remove ALL stored receipt images to free storage space. Booking records will be kept. Continue?'))return;
+  const btn=document.getElementById('cleanupBtn');
+  btn.disabled=true;btn.textContent='Cleaning...';
+  try{
+    const r=await fetch(`${API}/cleanup-storage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Error');
+    document.getElementById('cleanupResult').textContent=`Done! Freed storage from ${d.cleaned} receipt image(s).`;
+    document.getElementById('cleanupResult').style.color='#16a34a';
+  }catch(err){
+    document.getElementById('cleanupResult').textContent='Error: '+err.message;
+    document.getElementById('cleanupResult').style.color='#dc2626';
+  }finally{
+    btn.disabled=false;btn.textContent='Free Up All Storage Now';
+  }
+}
+
+async function loadOldReceipts(){
+  const resultEl=document.getElementById('receiptMgmtResult');
+  resultEl.textContent='Loading...';resultEl.style.color='#6b7280';
+  try{
+    const r=await fetch(`${API}`);
+    const d=await r.json();
+    const cutoff=Date.now()-14*24*60*60*1000;
+    const old=(d.bookings||[]).filter(b=>b.hasPayment&&new Date(b.createdAt).getTime()<cutoff);
+    const wrap=document.getElementById('receiptManagerWrap');
+    const list=document.getElementById('receiptList');
+    if(old.length===0){
+      resultEl.textContent='No receipts older than 14 days found.';resultEl.style.color='#16a34a';
+      wrap.style.display='none';return;
+    }
+    list.innerHTML=old.map(b=>`
+      <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #f3f4f6;cursor:pointer;font-size:0.82rem">
+        <input type="checkbox" class="receipt-cb" value="${b.id}">
+        <span style="flex:1"><strong>${b.name}</strong> &nbsp;${b.date} &nbsp;${formatHour(b.startHour)}–${formatHour(b.endHour)}</span>
+        <span style="color:var(--muted);white-space:nowrap">${new Date(b.createdAt).toLocaleDateString('en-PH')}</span>
+      </label>`).join('');
+    wrap.style.display='block';
+    document.getElementById('selectAllReceipts').checked=false;
+    resultEl.textContent=`Found ${old.length} receipt(s) older than 14 days.`;resultEl.style.color='#374151';
+  }catch(err){
+    resultEl.textContent='Error loading receipts. Please try again.';resultEl.style.color='#dc2626';
+  }
+}
+
+function toggleSelectAllReceipts(cb){
+  document.querySelectorAll('.receipt-cb').forEach(c=>c.checked=cb.checked);
+}
+
+async function deleteSelectedReceipts(){
+  const selected=[...document.querySelectorAll('.receipt-cb:checked')].map(c=>c.value);
+  if(selected.length===0){alert('Please select at least one receipt.');return;}
+  if(!confirm(`Delete ${selected.length} receipt image(s)? Booking records will be kept.`))return;
+  const resultEl=document.getElementById('receiptMgmtResult');
+  resultEl.textContent='Deleting...';resultEl.style.color='#6b7280';
+  try{
+    const r=await fetch(`${API}/cleanup-storage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass,ids:selected})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Error');
+    resultEl.textContent=`Deleted ${d.cleaned} receipt image(s).`;resultEl.style.color='#16a34a';
+    loadOldReceipts();
+  }catch(err){
+    resultEl.textContent='Error: '+err.message;resultEl.style.color='#dc2626';
+  }
+}
+
+async function autoDeleteOldReceipts(){
+  if(!confirm('Auto-delete ALL receipt images older than 14 days? Booking records and details will be kept.'))return;
+  const resultEl=document.getElementById('receiptMgmtResult');
+  resultEl.textContent='Deleting...';resultEl.style.color='#6b7280';
+  try{
+    const r=await fetch(`${API}/cleanup-storage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass,olderThanDays:14})});
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Error');
+    resultEl.textContent=`Done! Deleted ${d.cleaned} receipt image(s) older than 14 days.`;resultEl.style.color='#16a34a';
+    document.getElementById('receiptManagerWrap').style.display='none';
+  }catch(err){
+    resultEl.textContent='Error: '+err.message;resultEl.style.color='#dc2626';
+  }
+}
+
+async function cancelBooking(id){
+  if(!confirm('Cancel this booking?'))return;
+  const r=await fetch(`${API}/${id}`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass})});
+  if(r.ok)refreshAll();
+  else alert('Error cancelling.');
+}
+
+async function deleteBooking(id){
+  if(!confirm('Permanently DELETE this booking? This cannot be undone.'))return;
+  const r=await fetch(`${API}/${id}`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass,hardDelete:true})});
+  if(r.ok)refreshAll();
+  else alert('Error deleting booking.');
+}
+
+// ─── Add Internal Booking ──────────────────────────────────
+function toggleAddType(){
+  const type=document.getElementById('addType').value;
+  document.getElementById('addCustomerFields').style.display=type==='customer'?'block':'none';
+  document.getElementById('addInternalFields').style.display=type==='internal'?'block':'none';
+  document.getElementById('addPaymentSection').style.display=type==='internal'?'block':'none';
+  // Open Play: no customer fields, no payment, uses label field for optional name
+  if(type==='open_play'){
+    document.getElementById('addCustomerFields').style.display='none';
+    document.getElementById('addInternalFields').style.display='none';
+    document.getElementById('addPaymentSection').style.display='none';
+  }
+}
+
+function toggleEditHoldReason(){
+  const status=document.getElementById('editStatus').value;
+  document.getElementById('editHoldReasonGroup').style.display=status==='on_hold'?'block':'none';
+}
+
+function updateEditPaddleTotal(){
+  const qty=Math.max(0,parseInt(document.getElementById('editPaddleQty').value,10)||0);
+  document.getElementById('editPaddleTotal').textContent=`= ₱${qty*50}`;
+}
+
+function initAddDayRows(){
+  const now=new Date();
+  addDayRows=[{date:getLocalDateStr(now),start:OPEN_HOUR,end:OPEN_HOUR+1}];
+  renderAddDayRows();
+}
+
+function addDayRow(){
+  const now=new Date();
+  addDayRows.push({date:getLocalDateStr(now),start:OPEN_HOUR,end:OPEN_HOUR+1});
+  renderAddDayRows();
+}
+
+function removeAddDayRow(i){
+  if(addDayRows.length<=1)return;
+  addDayRows.splice(i,1);
+  renderAddDayRows();
+}
+
+function renderAddDayRows(){
+  const container=document.getElementById('addDayRowsContainer');
+  container.innerHTML='';
+  addDayRows.forEach((row,i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='background:#f8f8f4;border-radius:8px;padding:10px 12px;margin-bottom:8px;position:relative';
+    const startSel=document.createElement('select');
+    const endSel=document.createElement('select');
+    populateHourSelect(startSel,row.start);
+    populateHourSelect(endSel,row.end);
+    startSel.style.cssText='width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:"DM Sans",sans-serif;font-size:0.83rem;margin-top:4px';
+    endSel.style.cssText='width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:"DM Sans",sans-serif;font-size:0.83rem;margin-top:4px';
+    startSel.addEventListener('change',()=>{addDayRows[i].start=parseFloat(startSel.value);});
+    endSel.addEventListener('change',()=>{addDayRows[i].end=parseFloat(endSel.value);});
+    const dateInput=document.createElement('input');
+    dateInput.type='date';dateInput.value=row.date;
+    dateInput.style.cssText='width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:"DM Sans",sans-serif;font-size:0.83rem;margin-top:4px';
+    dateInput.addEventListener('change',()=>{addDayRows[i].date=dateInput.value;loadAddSlots(dateInput.value,div);});
+    const removeBtn=document.createElement('button');
+    removeBtn.textContent='×';
+    removeBtn.style.cssText=`position:absolute;top:8px;right:8px;background:var(--red-pale);color:var(--red);border:none;border-radius:6px;cursor:pointer;padding:2px 8px;font-size:1rem;font-weight:700;display:${addDayRows.length>1?'block':'none'}`;
+    removeBtn.addEventListener('click',()=>removeAddDayRow(i));
+    const rowLabel=document.createElement('div');
+    rowLabel.style.cssText='font-size:0.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px';
+    rowLabel.textContent=`Day ${i+1}`;
+    const timeRow=document.createElement('div');
+    timeRow.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px';
+    const startWrap=document.createElement('div');
+    const startLabel=document.createElement('div');
+    startLabel.style.cssText='font-size:0.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px';
+    startLabel.textContent='Start Time';
+    startWrap.appendChild(startLabel);startWrap.appendChild(startSel);
+    const endWrap=document.createElement('div');
+    const endLabel=document.createElement('div');
+    endLabel.style.cssText='font-size:0.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px';
+    endLabel.textContent='End Time';
+    endWrap.appendChild(endLabel);endWrap.appendChild(endSel);
+    timeRow.appendChild(startWrap);timeRow.appendChild(endWrap);
+    const dateLabel=document.createElement('div');
+    dateLabel.style.cssText='font-size:0.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px';
+    dateLabel.textContent='Date';
+    div.appendChild(removeBtn);
+    div.appendChild(rowLabel);
+    div.appendChild(dateLabel);
+    div.appendChild(dateInput);
+    div.appendChild(timeRow);
+    container.appendChild(div);
+  });
+  const firstDate=addDayRows[0]&&addDayRows[0].date;
+  if(firstDate)loadAddSlots(firstDate,null);
+}
+
+async function loadAddSlots(date,rowEl){
+  if(!date)date=addDayRows[0]&&addDayRows[0].date;
+  if(!date)return;
+  const month=date.slice(0,7);
+  const bookings=await fetchBookings(month);
+  const dayBks=bookings.filter(b=>b.date===date&&b.status!=='cancelled');
+  const panel=document.getElementById('addDayPreviewPanel');
+  const title=document.getElementById('addDayPreviewTitle');
+  const slotsEl=document.getElementById('addDaySlots');
+  const[y,m,d]=date.split('-');
+  title.textContent=`📅 ${new Date(y,m-1,d).toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric'})} – Availability`;
+  slotsEl.innerHTML='';
+  let h=ADMIN_OPEN_HOUR;
+  while(h<ADMIN_CLOSE_HOUR){
+    const end=h+1;
+    const bk=dayBks.find(b=>h<b.endHour&&end>b.startHour&&b.status!=='on_hold');
+    const onHoldBk=!bk&&dayBks.find(b=>h<b.endHour&&end>b.startHour&&b.status==='on_hold');
+    const div=document.createElement('div');
+    let bg='var(--green-pale)',color='var(--green)',label='✓ Available';
+    if(bk){
+      if(bk.type==='block'){bg='var(--orange-pale)';color='var(--orange)';label='🚫 Blocked';}
+      else if(bk.type==='internal'){bg='var(--blue-pale)';color='var(--blue)';label='🔵 Internal';}
+      else{bg='var(--red-pale)';color='var(--red)';label='🔒 Booked';}
+    }else if(onHoldBk){bg='var(--purple-pale)';color='var(--purple)';label='⏸ On Hold (open)';}
+    div.style.cssText=`padding:8px 12px;border-radius:8px;background:${bg};color:${color};font-size:0.78rem;font-weight:500;display:flex;justify-content:space-between`;
+    div.innerHTML=`<span>${formatHour(h)}</span><span>${label}</span>`;
+    slotsEl.appendChild(div);
+    h+=1;
+  }
+  panel.style.display='block';
+}
+
+async function submitAdminBooking(){
+  const type=document.getElementById('addType').value;
+  const notes=document.getElementById('addNotes').value.trim();
+  const staffName=document.getElementById('addStaffName').value.trim();
+  const errEl=document.getElementById('addError');
+  const sucEl=document.getElementById('addSuccess');
+  errEl.style.display='none';sucEl.style.display='none';
+
+  if(!staffName){errEl.textContent='Please enter your name in "Added By".';errEl.style.display='block';return;}
+
+  let name,phone;
+  if(type==='customer'){
+    name=document.getElementById('addName').value.trim();
+    phone=document.getElementById('addPhone').value.trim();
+    if(!name||!phone){errEl.textContent='Please fill in name and phone.';errEl.style.display='block';return;}
+  }else if(type==='open_play'){
+    name='[Open Play]';
+    phone='—';
+  }else{
+    name=document.getElementById('addLabel').value.trim()||'[Internal Session]';
+    phone='—';
+  }
+  if(addDayRows.length===0){errEl.textContent='Please add at least one date row.';errEl.style.display='block';return;}
+  for(const row of addDayRows){
+    if(!row.date){errEl.textContent='Please fill in all dates.';errEl.style.display='block';return;}
+    if(row.end<=row.start){errEl.textContent='End time must be after start time in all rows.';errEl.style.display='block';return;}
+  }
+
+  const addPayType=type==='internal'?document.getElementById('addPaymentType').value||null:null;
+  const addPayStatus=type==='internal'?document.getElementById('addPaymentStatus').value||null:null;
+
+  const added=[];
+  for(const row of addDayRows){
+    const payload={name,phone,date:row.date,startHour:row.start,endHour:row.end,notes,type,adminPassword:adminPass,addedByName:staffName};
+    if(type==='internal'){
+      payload.paymentType=addPayType;
+      payload.paymentStatus=addPayStatus;
+      if(addPendingPaymentData)payload.paymentData=addPendingPaymentData;
+    } else {
+      payload.paymentData=null;
+    }
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||`Error creating booking for ${formatDate(row.date)}.`;errEl.style.display='block';return;}
+    added.push(`${formatDate(row.date)} ${formatHour(row.start)}–${formatHour(row.end)}`);
+  }
+
+  sucEl.innerHTML=`✓ ${added.length} booking(s) added for "${name}":<br>${added.join('<br>')}`;
+  sucEl.style.display='block';
+  document.getElementById('addStaffName').value='';
+  document.getElementById('addName').value='';
+  document.getElementById('addPhone').value='';
+  document.getElementById('addLabel').value='';
+  document.getElementById('addNotes').value='';
+  document.getElementById('addPaymentType').value='';
+  document.getElementById('addPaymentStatus').value='';
+  document.getElementById('addPayUploadLabel').textContent='📎 Click to upload receipt';
+  document.getElementById('addPayPreviewImg').style.display='none';
+  addPendingPaymentData=null;
+  initAddDayRows();
+  refreshAll();
+}
+
+// ─── Block ─────────────────────────────────────────────────
+function initBlockMonthSelector(){
+  const sel=document.getElementById('blockViewMonth');
+  if(!sel||sel.options.length>0)return;
+  const now=new Date();
+  for(let i=-1;i<=3;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+    const val=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const opt=document.createElement('option');
+    opt.value=val;
+    opt.textContent=MONTHS[d.getMonth()]+' '+d.getFullYear();
+    if(i===0)opt.selected=true;
+    sel.appendChild(opt);
+  }
+}
+async function loadActiveBlocks(){
+  const sel=document.getElementById('blockViewMonth');
+  if(!sel)return;
+  const month=sel.value;
+  const el=document.getElementById('activeBlocksList');
+  el.innerHTML=`<div class="loading"><span class="spinner"></span> Loading...</div>`;
+  const bookings=await fetchBookings(month);
+  const blocks=bookings.filter(b=>b.type==='block'&&b.status!=='cancelled');
+  if(!blocks.length){el.innerHTML=`<div class="no-data" style="padding:24px"><div class="big">✅</div>No active blocks this month</div>`;return;}
+  el.innerHTML='';
+  blocks.forEach(b=>{
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff5f5;border:1px solid #fcc;border-radius:8px;margin-bottom:8px';
+    div.innerHTML=`<div style="flex:1">
+      <div style="font-size:0.73rem;color:var(--muted)">${formatDate(b.date)}</div>
+      <div style="font-size:0.84rem;font-weight:600;color:#8b4000">${formatHour(b.startHour)} – ${formatHour(b.endHour)}</div>
+      <div style="font-size:0.73rem;color:var(--muted)">${b.reason||'Internal Block'}</div>
+    </div>
+    <button onclick="removeBlock('${b.id}')" class="btn-sm btn-cancel">✕ Remove</button>`;
+    el.appendChild(div);
+  });
+}
+async function loadBlockSlots(){
+  const date=document.getElementById('blockDate').value;
+  if(!date)return;
+  const month=date.slice(0,7);
+  const bookings=await fetchBookings(month);
+  const dayBks=bookings.filter(b=>b.date===date&&b.status!=='cancelled');
+  const panel=document.getElementById('blockDayPreviewPanel');
+  const title=document.getElementById('blockDayPreviewTitle');
+  const slotsEl=document.getElementById('blockDaySlots');
+  const[y,m,d]=date.split('-');
+  title.textContent=`📅 ${new Date(y,m-1,d).toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric'})}`;
+  slotsEl.innerHTML='';
+  let h=ADMIN_OPEN_HOUR;
+  while(h<ADMIN_CLOSE_HOUR){
+    const end=h+1;
+    const bk=dayBks.find(b=>h<b.endHour&&end>b.startHour&&b.status!=='on_hold');
+    const onHoldBk=!bk&&dayBks.find(b=>h<b.endHour&&end>b.startHour&&b.status==='on_hold');
+    const chip=document.createElement('div');
+    let bg='var(--green-pale)',color='var(--green)',label='✓ Free';
+    if(bk){
+      if(bk.type==='block'){bg='var(--orange-pale)';color='var(--orange)';label='🚫 Blocked';}
+      else{bg='var(--red-pale)';color='var(--red)';label='🔒 Booked';}
+    }else if(onHoldBk){bg='var(--purple-pale)';color='var(--purple)';label='⏸ On Hold (open)';}
+    chip.style.cssText=`padding:7px;border-radius:8px;background:${bg};color:${color};font-size:0.72rem;font-weight:500;text-align:center`;
+    chip.innerHTML=`<strong>${formatHour(h)}</strong><br>${label}`;
+    slotsEl.appendChild(chip);
+    h+=1;
+  }
+  panel.style.display='block';
+}
+async function createBlock(){
+  const date=document.getElementById('blockDate').value;
+  const startHour=parseFloat(document.getElementById('blockStart').value);
+  const endHour=parseFloat(document.getElementById('blockEnd').value);
+  const reason=document.getElementById('blockReason').value.trim();
+  const errEl=document.getElementById('blockError');
+  errEl.style.display='none';
+  if(!date){errEl.textContent='Please select a date.';errEl.style.display='block';return;}
+  if(endHour<=startHour){errEl.textContent='End time must be after start time.';errEl.style.display='block';return;}
+  const r=await fetch(API+'/block',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass,date,startHour,endHour,reason})});
+  const d=await r.json();
+  if(!r.ok){errEl.textContent=d.error||'Error creating block.';errEl.style.display='block';return;}
+  document.getElementById('blockReason').value='';
+  loadActiveBlocks();loadBlockSlots();refreshAll();
+}
+async function removeBlock(id){
+  if(!confirm('Remove this block?'))return;
+  const r=await fetch(API+'/block/'+id,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass})});
+  if(r.ok){loadActiveBlocks();loadBlockSlots();refreshAll();}
+  else alert('Error removing block.');
+}
+
+// ─── Export CSV ────────────────────────────────────────────
+async function exportCSV(type){
+  const exportMonthEl=document.getElementById('exportMonth');
+  const now=new Date();
+  let month=exportMonthEl&&exportMonthEl.value?exportMonthEl.value:`${bkYear}-${String(bkMonth+1).padStart(2,'0')}`;
+  const bookings=await fetchBookings(month);
+  let rows=bookings;
+  if(type==='week'){
+    const dayOfWeek=now.getDay();
+    const weekStart=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dayOfWeek);
+    const weekEnd=new Date(weekStart.getFullYear(),weekStart.getMonth(),weekStart.getDate()+6);
+    rows=bookings.filter(b=>{
+      const[y,m,d]=b.date.split('-');
+      const bd=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+      return bd>=weekStart&&bd<=weekEnd;
+    });
+  }
+  const header=['ID','Type','Name','Phone','Date','Start Time','End Time','Duration (hrs)','Status','Has Payment','Notes','Booked At'];
+  const csvRows=[header,...rows.map(b=>[
+    b.id,b.type||'customer',b.name,b.phone||'',b.date,
+    formatHour(b.startHour),formatHour(b.endHour),b.endHour-b.startHour,
+    b.status,b.hasPayment?'Yes':'No',
+    (b.notes||'').replace(/,/g,''),new Date(b.createdAt).toLocaleString('en-PH')
+  ])];
+  const csv=csvRows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`dinkanddirt-bookings-${type}-${month}.csv`;a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function loadAdminSettings(){
+  try{
+    const r=await fetch(`${API}/settings`);
+    const d=await r.json();
+    if(d.settings){
+      const openSel=document.getElementById('settingsOpen');
+      const closeSel=document.getElementById('settingsClose');
+      if(openSel)openSel.value=d.settings.customerOpenHour;
+      if(closeSel)closeSel.value=d.settings.customerCloseHour;
+    }
+  }catch(e){}
+}
+
+async function saveSettings(){
+  const openSel=document.getElementById('settingsOpen');
+  const closeSel=document.getElementById('settingsClose');
+  const errEl=document.getElementById('settingsError');
+  const sucEl=document.getElementById('settingsSuccess');
+  errEl.style.display='none';sucEl.style.display='none';
+  const customerOpenHour=Number(openSel.value);
+  const customerCloseHour=Number(closeSel.value);
+  if(customerCloseHour<=customerOpenHour){errEl.textContent='Close hour must be after open hour.';errEl.style.display='block';return;}
+  try{
+    const r=await fetch(`${API}/settings`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminPassword:adminPass,customerOpenHour,customerCloseHour})});
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Error saving settings.';errEl.style.display='block';return;}
+    sucEl.textContent=`✓ Settings saved: Open ${formatHour(customerOpenHour)} – Close ${formatHour(customerCloseHour)}`;
+    sucEl.style.display='block';
+  }catch(e){errEl.textContent='Network error.';errEl.style.display='block';}
+}
+
+async function pollNotifications(){
+  try{
+    const now=new Date();
+    const months=[0,-1].map(i=>{const d=new Date(now.getFullYear(),now.getMonth()+i,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;});
+    let bookings=[];
+    for(const m of months){const bks=await fetchBookings(m);bookings=bookings.concat(bks);}
+    const seen=new Set();bookings=bookings.filter(b=>{if(seen.has(b.id))return false;seen.add(b.id);return true;});
+    const newOnes=bookings.filter(b=>b.createdAt&&b.createdAt>lastSeenAt);
+    const badge=document.getElementById('notifBadge');
+    if(newOnes.length>0){
+      badge.textContent=newOnes.length;badge.style.display='inline';
+      if(Notification&&Notification.permission==='granted'&&newOnes.length>0){
+        new Notification('Dink & Dirt Pickleball',{body:`${newOnes.length} new booking(s)`,icon:'/favicon.ico'});
+      }
+    }else{badge.style.display='none';}
+  }catch(e){}
+}
+
+async function loadNotifications(){
+  const el=document.getElementById('notifList');
+  el.innerHTML=`<div class="loading"><span class="spinner"></span> Loading...</div>`;
+  try{
+    const now=new Date();
+    // Load 6 months back through 3 months ahead — covers all relevant history
+    const months=[];
+    for(let i=-6;i<=3;i++){
+      const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+      months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+    let all=[];
+    for(const m of months){const bks=await fetchBookings(m);all=all.concat(bks);}
+    // Deduplicate by id
+    const seen=new Set();
+    all=all.filter(b=>{if(!b.createdAt||seen.has(b.id))return false;seen.add(b.id);return true;});
+    if(!all.length){el.innerHTML=`<div class="no-data"><div class="big">📭</div>No bookings found</div>`;return;}
+    // Split: new (unread) on top, then earlier — each group sorted newest first
+    const newOnes=all.filter(b=>b.createdAt>lastSeenAt).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+    const oldOnes=all.filter(b=>b.createdAt<=lastSeenAt).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+    const sorted=[...newOnes,...oldOnes];
+    let html='';
+    if(newOnes.length>0){
+      html+=`<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--yellow-dark);margin-bottom:10px;padding:0 2px">🆕 New Bookings (${newOnes.length})</div>`;
+    }
+    let dividerShown=newOnes.length===0;
+    sorted.forEach(b=>{
+      const isNew=b.createdAt>lastSeenAt;
+      if(!isNew&&!dividerShown){
+        dividerShown=true;
+        html+=`<div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin:16px 0 10px;padding:0 2px;border-top:1px solid var(--border);padding-top:14px">Earlier</div>`;
+      }
+      const hrs=b.endHour-b.startHour;
+      const statusBadge=b.status==='confirmed'
+        ?`<span class="badge badge-green">✓ Confirmed</span>`
+        :b.status==='on_hold'
+        ?`<span class="badge badge-purple">⏸ On Hold</span>`
+        :`<span class="badge badge-red">✗ Cancelled</span>`;
+      html+=`<div style="background:white;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);border-left:4px solid ${isNew?'#f0c040':'#e8e8e4'}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+          <strong style="font-size:0.9rem">${b.name}</strong>
+          ${getTypeBadge(b)}
+          ${statusBadge}
+          ${isNew?`<span style="background:#f0c040;color:#1a1a1a;border-radius:4px;padding:1px 7px;font-size:0.68rem;font-weight:700">🆕 NEW</span>`:''}
+        </div>
+        <div style="font-size:0.78rem;color:var(--muted)">📅 ${formatDate(b.date)} &nbsp;·&nbsp; ⏰ ${formatHour(b.startHour)}–${formatHour(b.endHour)} (${hrs}h) &nbsp;·&nbsp; 📞 ${b.phone||'—'}</div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:4px">Booked on: ${new Date(b.createdAt).toLocaleString('en-PH',{weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+        ${b.holdReason?`<div style="font-size:0.72rem;color:var(--purple);margin-top:4px">⏸ Hold reason: ${b.holdReason}</div>`:''}
+      </div>`;
+    });
+    el.innerHTML=html;
+  }catch(e){el.innerHTML=`<div class="error-banner">Error loading notifications. Please try again.</div>`;}
+}
+
+function markAllRead(){
+  lastSeenAt=new Date().toISOString();
+  localStorage.setItem('dinkanddirt_admin_last_seen',lastSeenAt);
+  const badge=document.getElementById('notifBadge');
+  badge.textContent='0';badge.style.display='none';
+}
+
+// ─── Add Booking receipt upload ────────────────────────────
+async function handleAddPayUpload(input){
+  const file=input.files[0];
+  if(!file)return;
+  document.getElementById('addPayUploadLabel').textContent='Processing...';
+  try{
+    addPendingPaymentData=await compressImage(file);
+    const img=document.getElementById('addPayPreviewImg');
+    img.src=addPendingPaymentData;img.style.display='block';
+    document.getElementById('addPayUploadLabel').textContent='✓ Receipt selected';
+  }catch(err){
+    document.getElementById('addPayUploadLabel').textContent='Failed to process image. Try again.';
+  }
+}
+
+// ─── On Hold Bookings Panel ────────────────────────────────
+async function loadOnHoldBookings(){
+  const el=document.getElementById('onHoldList');
+  const countEl=document.getElementById('onHoldCount');
+  const statEl=document.getElementById('statOnHold');
+  el.innerHTML=`<div class="loading"><span class="spinner"></span> Loading...</div>`;
+  try{
+    const now=new Date();
+    // Load past month, current, and next 2 months to catch all holds
+    const months=[];
+    for(let i=-1;i<=2;i++){
+      const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+      months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+    let all=[];
+    for(const m of months){
+      const bks=await fetchBookings(m);
+      all=all.concat(bks);
+    }
+    // Deduplicate by id
+    const seen=new Set();
+    all=all.filter(b=>{if(seen.has(b.id))return false;seen.add(b.id);return true;});
+    const holds=all.filter(b=>b.status==='on_hold');
+    holds.sort((a,b)=>a.date.localeCompare(b.date)||a.startHour-b.startHour);
+    countEl.textContent=`${holds.length} hold${holds.length!==1?'s':''}`;
+    if(statEl)statEl.textContent=holds.length;
+    if(!holds.length){
+      el.innerHTML=`<div style="text-align:center;color:var(--muted);font-size:0.85rem;padding:10px 0">No bookings currently on hold ✓</div>`;
+      return;
+    }
+    let html='';
+    holds.forEach(b=>{
+      const hrs=b.endHour-b.startHour;
+      html+=`<div class="on-hold-item">
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:0.88rem">${b.name} <span style="font-size:0.72rem;font-weight:400;color:var(--muted)">${b.phone||''}</span></div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:2px">📅 ${formatDate(b.date)} · ⏰ ${formatHour(b.startHour)}–${formatHour(b.endHour)} (${hrs}h)</div>
+          ${b.holdReason?`<div class="reason-tag">⏸ ${b.holdReason}</div>`:'<div class="reason-tag" style="opacity:0.5">No reason given</div>'}
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0;align-items:center">
+          <button class="btn-sm btn-edit" onclick="editBooking('${b.id}')">✏️</button>
+          <button class="btn-sm btn-hold" onclick="openHoldModal('${b.id}')" title="Update hold reason">⏸✏</button>
+          <button class="btn-sm btn-view" onclick="viewBooking('${b.id}')">👁</button>
+        </div>
+      </div>`;
+    });
+    el.innerHTML=html;
+  }catch(e){
+    el.innerHTML=`<div class="error-banner">Error loading holds.</div>`;
+  }
+}
+
+// ─── Hold Modal ────────────────────────────────────────────
+async function openHoldModal(id){
+  const r=await fetch(`${API}/${id}?admin=${encodeURIComponent(adminPass)}`);
+  const {booking}=await r.json();
+  if(!booking)return;
+  document.getElementById('holdBookingId').value=id;
+  document.getElementById('holdBookingInfo').innerHTML=
+    `<strong>${booking.name}</strong> &nbsp;·&nbsp; ${formatDate(booking.date)} &nbsp;·&nbsp; ${formatHour(booking.startHour)}–${formatHour(booking.endHour)}`;
+  document.getElementById('holdReason').value=booking.holdReason||'';
+  document.getElementById('holdModal').classList.add('open');
+}
+
+async function confirmHold(){
+  const id=document.getElementById('holdBookingId').value;
+  const reason=document.getElementById('holdReason').value.trim();
+  if(!reason){alert('Please enter a reason for the hold.');document.getElementById('holdReason').focus();return;}
+  const r=await fetch(`${API}/${id}`,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({adminPassword:adminPass,status:'on_hold',holdReason:reason})
+  });
+  const d=await r.json();
+  if(!r.ok)return alert(d.error||'Error putting booking on hold.');
+  closeModal('holdModal');
+  refreshAll();
+  loadOnHoldBookings();
+}
+
+// ─── Hold All Today ────────────────────────────────────────
+async function holdAllToday(){
+  const now=new Date();
+  const todayStr=getLocalDateStr(now);
+  const month=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const bookings=await fetchBookings(month);
+  const eligible=bookings.filter(b=>b.date===todayStr&&b.status==='confirmed'&&b.type!=='block');
+  if(!eligible.length){alert('No confirmed bookings today to hold.');return;}
+  const infoEl=document.getElementById('holdAllInfo');
+  infoEl.innerHTML=`This will put <strong>${eligible.length} booking(s)</strong> on hold for today (${now.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric'})}):<br><br>`
+    +eligible.map(b=>`• ${b.name} · ${formatHour(b.startHour)}–${formatHour(b.endHour)}`).join('<br>');
+  document.getElementById('holdAllReason').value='';
+  document.getElementById('holdAllModal').classList.add('open');
+}
+
+async function confirmHoldAll(){
+  const reason=document.getElementById('holdAllReason').value.trim();
+  if(!reason){alert('Please enter a reason for the hold.');document.getElementById('holdAllReason').focus();return;}
+  const now=new Date();
+  const todayStr=getLocalDateStr(now);
+  const month=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const bookings=await fetchBookings(month);
+  const eligible=bookings.filter(b=>b.date===todayStr&&b.status==='confirmed'&&b.type!=='block');
+  let errors=0;
+  for(const b of eligible){
+    const r=await fetch(`${API}/${b.id}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({adminPassword:adminPass,status:'on_hold',holdReason:reason})
+    });
+    if(!r.ok)errors++;
+  }
+  closeModal('holdAllModal');
+  if(errors)alert(`${eligible.length-errors} booking(s) put on hold. ${errors} failed.`);
+  refreshAll();
+  loadOnHoldBookings();
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+document.getElementById('loginPass').focus();
+
+// ─── Promo Banner ───────────────────────────────────────────
+let bannerImageData=null;
+
+async function loadBanner(){
+  const errEl=document.getElementById('bannerError');
+  const sucEl=document.getElementById('bannerSuccess');
+  errEl.style.display='none'; sucEl.style.display='none';
+  try{
+    const r=await fetch(`${API}/banner`);
+    const d=await r.json();
+    const b=d.banner||{};
+    document.getElementById('bannerActive').checked=!!b.active;
+    document.getElementById('bannerLink').value=b.link||'';
+    bannerImageData=b.imageData||null;
+    if(bannerImageData){
+      document.getElementById('bannerPreview').src=bannerImageData;
+      document.getElementById('bannerPreviewWrap').style.display='block';
+      document.getElementById('bannerUploadContent').innerHTML='<div style="font-size:0.8rem;color:var(--green)">✓ Banner image loaded. Click to replace.</div>';
+    }
+  }catch(e){errEl.textContent='Failed to load banner settings.';errEl.style.display='block';}
+}
+
+async function saveBanner(){
+  const errEl=document.getElementById('bannerError');
+  const sucEl=document.getElementById('bannerSuccess');
+  errEl.style.display='none'; sucEl.style.display='none';
+  const active=document.getElementById('bannerActive').checked;
+  const link=document.getElementById('bannerLink').value.trim();
+  if(active&&!bannerImageData){errEl.textContent='Please upload a banner image before enabling.';errEl.style.display='block';return;}
+  try{
+    const r=await fetch(`${API}/banner`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({adminPassword:adminPass,active,imageData:bannerImageData,link})
+    });
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Failed to save.';errEl.style.display='block';return;}
+    sucEl.textContent='✓ Banner saved!';sucEl.style.display='block';
+    setTimeout(()=>sucEl.style.display='none',3000);
+  }catch(e){errEl.textContent='Network error.';errEl.style.display='block';}
+}
+
+function handleBannerUpload(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1400;
+      let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      bannerImageData=canvas.toDataURL('image/jpeg',0.8);
+      document.getElementById('bannerPreview').src=bannerImageData;
+      document.getElementById('bannerPreviewWrap').style.display='block';
+      document.getElementById('bannerUploadContent').innerHTML=`<div style="font-size:0.8rem;color:var(--green)">✓ ${file.name} — click to replace</div>`;
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearBanner(){
+  bannerImageData=null;
+  document.getElementById('bannerPreview').src='';
+  document.getElementById('bannerPreviewWrap').style.display='none';
+  document.getElementById('bannerUploadContent').innerHTML='<div style="font-size:1.5rem;margin-bottom:6px">🖼️</div><div style="font-size:0.82rem;color:var(--muted)">Click to upload banner image<br><span style="font-size:0.72rem">Recommended: 1200×300px or wider</span></div>';
+  document.getElementById('bannerFileInput').value='';
+}
+
+// ─── Hero & Carousel Settings ───────────────────────────────
+let heroImages=[]; // base64 strings for pending saves
+
+async function loadHeroSettings(){
+  const errEl=document.getElementById('heroError');
+  const sucEl=document.getElementById('heroSuccess');
+  errEl.style.display='none'; sucEl.style.display='none';
+  try{
+    const r=await fetch(`${API}/hero-settings`);
+    const d=await r.json();
+    const s=d.settings||{mode:'carousel',useCustomImages:false,images:[]};
+    document.getElementById(s.mode==='static'?'heroModeStatic':'heroModeCarousel').checked=true;
+    document.getElementById('heroUseCustom').checked=!!s.useCustomImages;
+    heroImages=[...(s.images||[])];
+    updateHeroModeLabels();
+    renderHeroImages();
+    updateHeroUploadHint();
+  }catch(e){errEl.textContent='Failed to load settings.';errEl.style.display='block';}
+}
+
+function onHeroModeChange(){
+  updateHeroModeLabels();
+  updateHeroUploadHint();
+  renderHeroImages();
+}
+
+function onHeroUseCustomChange(){
+  updateHeroUploadHint();
+  renderHeroImages();
+}
+
+function updateHeroModeLabels(){
+  const isCarousel=document.getElementById('heroModeCarousel').checked;
+  document.getElementById('heroModeCarouselLabel').style.borderColor=isCarousel?'var(--green)':'var(--border)';
+  document.getElementById('heroModeCarouselLabel').style.color=isCarousel?'var(--green)':'inherit';
+  document.getElementById('heroModeStaticLabel').style.borderColor=!isCarousel?'var(--green)':'var(--border)';
+  document.getElementById('heroModeStaticLabel').style.color=!isCarousel?'var(--green)':'inherit';
+}
+
+function updateHeroUploadHint(){
+  const isCarousel=document.getElementById('heroModeCarousel').checked;
+  const useCustom=document.getElementById('heroUseCustom').checked;
+  const section=document.getElementById('heroImagesSection');
+  const label=document.getElementById('heroImagesLabel');
+  const note=document.getElementById('heroUploadNote');
+  const hint=document.getElementById('heroUploadHint');
+  const fileInput=document.getElementById('heroFileInput');
+
+  section.style.display=useCustom?'block':'none';
+  if(isCarousel){
+    label.textContent='Carousel Photos';
+    note.textContent='Up to 10 photos. Drag to reorder. Minimum 1.';
+    hint.textContent='📎 Click to add more carousel photos';
+    fileInput.multiple=true;
+  } else {
+    label.textContent='Single Hero Photo';
+    note.textContent='One photo will fill the entire banner.';
+    hint.textContent='📎 Click to upload a single photo';
+    fileInput.multiple=false;
+  }
+}
+
+function renderHeroImages(){
+  const grid=document.getElementById('heroImageGrid');
+  const isCarousel=document.getElementById('heroModeCarousel').checked;
+  const useCustom=document.getElementById('heroUseCustom').checked;
+  grid.innerHTML='';
+  if(!useCustom){grid.innerHTML='<div style="font-size:0.82rem;color:var(--muted);padding:10px 0">Using default photos from the site.</div>';return;}
+  if(!heroImages.length){grid.innerHTML='<div style="font-size:0.82rem;color:var(--muted);padding:10px 0">No photos uploaded yet.</div>';return;}
+  const show=isCarousel?heroImages:heroImages.slice(0,1);
+  let dragSrc=null;
+  show.forEach((src,i)=>{
+    const wrap=document.createElement('div');
+    wrap.style.cssText='position:relative;width:110px;height:80px;border-radius:8px;overflow:hidden;border:2px solid var(--border);flex-shrink:0;cursor:grab';
+    wrap.draggable=true;
+    wrap.dataset.idx=i;
+
+    wrap.addEventListener('dragstart',e=>{
+      dragSrc=i;
+      wrap.style.opacity='0.5';
+      e.dataTransfer.effectAllowed='move';
+    });
+    wrap.addEventListener('dragend',()=>{wrap.style.opacity='1';});
+    wrap.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';wrap.style.borderColor='var(--green)';});
+    wrap.addEventListener('dragleave',()=>{wrap.style.borderColor='var(--border)';});
+    wrap.addEventListener('drop',e=>{
+      e.preventDefault();
+      wrap.style.borderColor='var(--border)';
+      if(dragSrc===null||dragSrc===i)return;
+      const moved=heroImages.splice(dragSrc,1)[0];
+      heroImages.splice(i,0,moved);
+      dragSrc=null;
+      renderHeroImages();
+    });
+
+    const img=document.createElement('img');
+    img.src=src;
+    img.style.cssText='width:100%;height:100%;object-fit:cover;pointer-events:none;';
+    const btn=document.createElement('button');
+    btn.innerHTML='✕';
+    btn.title='Remove';
+    btn.style.cssText='position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.72rem;display:flex;align-items:center;justify-content:center;line-height:1';
+    btn.onclick=(e)=>{e.stopPropagation();heroImages.splice(i,1);renderHeroImages();};
+    if(i===0){const badge=document.createElement('div');badge.textContent='★';badge.style.cssText='position:absolute;bottom:3px;left:4px;background:var(--yellow);color:#333;border-radius:3px;font-size:0.62rem;font-weight:700;padding:1px 4px';wrap.appendChild(badge);}
+    wrap.appendChild(img);wrap.appendChild(btn);
+    grid.appendChild(wrap);
+  });
+}
+
+async function handleHeroImageUpload(input){
+  const isCarousel=document.getElementById('heroModeCarousel').checked;
+  const files=Array.from(input.files);
+  if(!files.length)return;
+
+  const hint=document.getElementById('heroUploadHint');
+  const slots=isCarousel?10-heroImages.length:1;
+  const toProcess=isCarousel?files.slice(0,slots):files.slice(0,1);
+  const skipped=files.length-toProcess.length;
+
+  if(!isCarousel){heroImages=[];}
+
+  hint.textContent=`⏳ Processing ${toProcess.length} photo${toProcess.length>1?'s':''}…`;
+
+  let done=0;
+  const results=await Promise.allSettled(toProcess.map(file=>
+    compressImage(file,1200,0.75).then(b64=>{
+      done++;
+      hint.textContent=`⏳ ${done}/${toProcess.length} processed…`;
+      return b64;
+    })
+  ));
+
+  results.forEach(r=>{if(r.status==='fulfilled'&&r.value){heroImages.push(r.value);}});
+  input.value='';
+
+  const failed=results.filter(r=>r.status==='rejected').length;
+  if(skipped>0&&failed>0)hint.textContent=`⚠️ ${failed} failed, ${skipped} skipped (10-photo limit). ${heroImages.length} total.`;
+  else if(skipped>0)hint.textContent=`✓ Added. ${skipped} photo${skipped>1?'s':''} skipped — 10-photo limit reached.`;
+  else if(failed>0)hint.textContent=`⚠️ ${failed} photo${failed>1?'s':''} couldn't be processed (try JPEG/PNG). ${heroImages.length} total.`;
+  else hint.textContent=`✓ ${results.length} photo${results.length>1?'s':''} added. Tap Save to apply.`;
+
+  renderHeroImages();
+}
+
+async function saveHeroSettings(){
+  const errEl=document.getElementById('heroError');
+  const sucEl=document.getElementById('heroSuccess');
+  errEl.style.display='none'; sucEl.style.display='none';
+  const mode=document.getElementById('heroModeCarousel').checked?'carousel':'static';
+  const useCustomImages=document.getElementById('heroUseCustom').checked;
+  if(useCustomImages&&!heroImages.length){errEl.textContent='Please upload at least one photo, or uncheck "Use my own photos".';errEl.style.display='block';return;}
+  try{
+    const r=await fetch(`${API}/hero-settings`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({adminPassword:adminPass,mode,useCustomImages,images:useCustomImages?heroImages:[]})
+    });
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Save failed.';errEl.style.display='block';return;}
+    sucEl.textContent='Hero settings saved! The public site will reflect changes on next load.';
+    sucEl.style.display='block';
+    setTimeout(()=>{sucEl.style.display='none';},4000);
+  }catch(e){errEl.textContent='Network error.';errEl.style.display='block';}
+}
+
+function compressImage(file,maxPx,quality){
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      let w=img.width,h=img.height;
+      if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg',quality));
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Failed to load image'));};
+    img.src=url;
+  });
+}
+</script>
+</body>
+</html>
