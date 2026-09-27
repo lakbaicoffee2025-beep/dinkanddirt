@@ -10,10 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f5e8;
-  --yellow:#f0c040;--yellow-dark:#c99a00;
+  --green:#1A4E86;--green-light:#2468B0;--green-pale:#E6EFF9;
+  --yellow:#F5D311;--yellow-dark:#8A7000;
   --red:#c44444;--red-pale:#fee;
-  --blue:#3a6fb5;--blue-pale:#e8eefd;
+  --blue:#0F8BA6;--blue-pale:#E3F5F9;
   --orange:#a05000;--orange-pale:#fff0e0;
   --purple:#6b21a8;--purple-light:#7c3aed;--purple-pale:#f5f3ff;
   --white:#fafaf7;--text:#1a1a1a;--muted:#666;--border:#ddd;
@@ -117,7 +117,7 @@ tr:last-child td{border-bottom:none;}
 tr:hover td{background:#fafaf7;}
 
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:0.7rem;font-weight:600;}
-.badge-green{background:var(--green-pale);color:var(--green);}
+.badge-green{background:#e8f5e8;color:#2d6a2d;}
 .badge-red{background:var(--red-pale);color:var(--red);}
 .badge-yellow{background:#fff9e0;color:var(--yellow-dark);}
 .badge-orange{background:var(--orange-pale);color:var(--orange);}
@@ -134,7 +134,7 @@ tr:hover td{background:#fafaf7;}
 .btn-rebook{background:#fff3e0;color:#b8740a;border:1px solid #f0c888;}
 .btn-hold{background:var(--purple-pale);color:var(--purple);border:1px solid #c4b5fd;}
 .badge-rebook{background:#fff3e0;color:#b8740a;border:1px solid #f0c888;font-size:0.62rem;display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;white-space:nowrap;}
-.modal-header.amber{background:#c4923a;}
+.modal-header.amber{background:#B8894F;}
 
 /* CALENDAR */
 .period-nav{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
@@ -219,7 +219,7 @@ tr:hover td{background:#fafaf7;}
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .error-banner{background:#fee;border:1px solid #fcc;color:#c44;padding:9px 13px;border-radius:8px;font-size:0.8rem;margin-bottom:12px;}
-.success-banner{background:var(--green-pale);border:1px solid var(--green);color:var(--green);padding:9px 13px;border-radius:8px;font-size:0.8rem;margin-bottom:12px;}
+.success-banner{background:#e8f5e8;border:1px solid #2d6a2d;color:#2d6a2d;padding:9px 13px;border-radius:8px;font-size:0.8rem;margin-bottom:12px;}
 .type-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
 .type-customer{background:var(--green-pale);color:var(--green);}
 .type-internal{background:var(--blue-pale);color:var(--blue);}
@@ -309,7 +309,7 @@ tr:hover td{background:#fafaf7;}
       <div class="nav-item" onclick="showPage('bookings')">📋 All Bookings</div>
       <div class="nav-item" onclick="showPage('add')">➕ Add Booking</div>
       <div class="nav-item" onclick="showPage('block')">🚫 Block Time</div>
-      <div class="nav-item" onclick="showPage('notifications')">🔔 Notifications <span id="notifBadge" style="display:none;background:#f0c040;color:#1a1a1a;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:700;margin-left:4px"></span></div>
+      <div class="nav-item" onclick="showPage('notifications')">🔔 Notifications <span id="notifBadge" style="display:none;background:#F5D311;color:#1a1a1a;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:700;margin-left:4px"></span></div>
       <div class="nav-item" onclick="showPage('hero')">🖼 Hero & Carousel</div>
       <div class="nav-item" onclick="showPage('banner')">📢 Promo Banner</div>
       <div class="nav-item" onclick="showPage('settings')">⚙️ Settings</div>
@@ -2048,12 +2048,12 @@ async function loadNotifications(){
         :b.status==='on_hold'
         ?`<span class="badge badge-purple">⏸ On Hold</span>`
         :`<span class="badge badge-red">✗ Cancelled</span>`;
-      html+=`<div style="background:white;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);border-left:4px solid ${isNew?'#f0c040':'#e8e8e4'}">
+      html+=`<div style="background:white;border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);border-left:4px solid ${isNew?'#F5D311':'#e8e8e4'}">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
           <strong style="font-size:0.9rem">${b.name}</strong>
           ${getTypeBadge(b)}
           ${statusBadge}
-          ${isNew?`<span style="background:#f0c040;color:#1a1a1a;border-radius:4px;padding:1px 7px;font-size:0.68rem;font-weight:700">🆕 NEW</span>`:''}
+          ${isNew?`<span style="background:#F5D311;color:#1a1a1a;border-radius:4px;padding:1px 7px;font-size:0.68rem;font-weight:700">🆕 NEW</span>`:''}
         </div>
         <div style="font-size:0.78rem;color:var(--muted)">📅 ${formatDate(b.date)} &nbsp;·&nbsp; ⏰ ${formatHour(b.startHour)}–${formatHour(b.endHour)} (${hrs}h) &nbsp;·&nbsp; 📞 ${b.phone||'—'}</div>
         <div style="font-size:0.7rem;color:var(--muted);margin-top:4px">Booked on: ${new Date(b.createdAt).toLocaleString('en-PH',{weekday:'short',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}</div>
