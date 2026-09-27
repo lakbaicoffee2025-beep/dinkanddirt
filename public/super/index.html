@@ -50,7 +50,8 @@ td.num,th.num{text-align:right;white-space:nowrap}
 .sched{white-space:nowrap;line-height:1.55}
 .badge{display:inline-block;font-size:.68rem;font-weight:600;border-radius:5px;padding:1px 6px;margin:1px 2px 1px 0}
 .b-online{background:var(--brand-pale);color:var(--brand)}
-.b-admin{background:#fff9e0;color:var(--yellow-dark)}
+.b-walkin{background:#fff9e0;color:var(--yellow-dark)}
+.b-private,.b-open_play{background:var(--grey-pale);color:var(--muted)}
 .b-confirmed{background:var(--green-pale);color:var(--green)}
 .b-on_hold{background:#fff9e0;color:var(--yellow-dark)}
 .b-cancelled{background:var(--grey-pale);color:var(--muted)}
@@ -114,7 +115,7 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand);cursor:poi
   <div class="card">
     <div class="note">
       <strong id="rateNote">₱10 per transaction</strong> — one customer checkout counts once, however many hours or dates it covers.
-      Month is based on <strong>when the booking was made</strong> (Philippine time). Transactions where every booking was cancelled are not billed.
+      Month is based on <strong>when the booking was made</strong> (Philippine time). Only <strong>online bookings</strong> and <strong>walk-ins added by the admin</strong> are billed; private sessions, open play and transactions where every booking was cancelled are not.
       Bookings the admin permanently deleted are still listed (marked <span class="badge b-deleted">deleted</span>).
       <span class="no-print">Untick <strong>Bill</strong> to leave a transaction off this statement (not saved — for printing/export only).</span>
     </div>
@@ -135,6 +136,8 @@ const API='/api/bookings';
 let pass='';
 let report=null;
 let waived=new Set(); // txnIds unticked in this view
+const SOURCE_LABELS={online:'Online',walkin:'Walk-in (admin)',private:'Private session',open_play:'Open play'};
+const BILLABLE=['online','walkin'];
 
 const peso=n=>'₱'+Number(n||0).toLocaleString('en-PH');
 const fmtHour=h=>{const hr=Math.floor(h),p=hr<12||hr===24?'AM':'PM',d=hr%12===0?12:hr%12;return `${d}${p}`;};
@@ -206,10 +209,10 @@ function renderRows(){
   tb.innerHTML=list.map(t=>{
     const billed=isBilled(t);
     const sched=t.items.map(i=>`${fmtDate(i.date)} · ${fmtHour(i.startHour)}–${fmtHour(i.endHour)}${i.status!=='confirmed'?` <span class="badge b-${esc(i.status)}">${esc(i.status.replace('_',' '))}</span>`:''}`).join('<br>');
-    const src=t.source==='admin'?'<span class="badge b-admin">Added by admin</span>':'<span class="badge b-online">Online</span>';
+    const src=`<span class="badge b-${esc(t.source)}">${esc(SOURCE_LABELS[t.source]||t.source)}</span>`;
     const box=t.billable
       ?`<input type="checkbox" ${billed?'checked':''} onchange="toggleBill('${esc(t.txnId)}',this.checked)" aria-label="Bill this transaction">`
-      :'<span class="muted" title="All bookings cancelled">—</span>';
+      :`<span class="muted" title="${BILLABLE.includes(t.source)?'All bookings cancelled':'Not billable: '+esc(SOURCE_LABELS[t.source]||t.source)}">—</span>`;
     return `<tr class="${billed?'':'waived'}">
       <td class="no-print">${box}</td>
       <td style="white-space:nowrap">${esc(fmtCreated(t.createdAt))}</td>
@@ -248,7 +251,7 @@ function exportCsv(){
   const rows=[['Transaction ID','Booked on (PH time)','Customer','Phone','Source','Schedule','Hours','Court amount','Billed','Commission']];
   report.transactions.forEach(t=>{
     const billed=isBilled(t);
-    rows.push([t.txnId,fmtCreated(t.createdAt),t.name,t.phone,t.source==='admin'?'Added by admin':'Online',
+    rows.push([t.txnId,fmtCreated(t.createdAt),t.name,t.phone,SOURCE_LABELS[t.source]||t.source,
       t.items.map(i=>`${i.date} ${fmtHour(i.startHour)}-${fmtHour(i.endHour)}${i.status!=='confirmed'?' ('+i.status+')':''}`).join('; '),
       t.hours,t.amount,billed?'Yes':'No',billed?report.commissionPerTransaction:0]);
   });

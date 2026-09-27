@@ -18,6 +18,16 @@ async function getPricePerHour(store) {
   return p > 0 ? p : DEFAULT_PRICE_PER_HOUR;
 }
 
+// Where a transaction came from: "online" (customer checkout), "walkin" (admin-added
+// customer), "private" (admin internal/private session) or "open_play".
+// Older open play bookings were saved as type "customer" with an "[Open Play]" name.
+const BILLABLE_SOURCES = ["online", "walkin"];
+function bookingSource(b) {
+  if (b.type === "open_play" || (b.type === "customer" && b.bookedByAdmin && String(b.name).startsWith("[Open Play]"))) return "open_play";
+  if (b.type === "internal") return "private";
+  return b.bookedByAdmin ? "walkin" : "online";
+}
+
 // "YYYY-MM" in Philippine time
 function manilaMonth(iso) {
   return new Date(Date.parse(iso) + 8 * 3600 * 1000).toISOString().slice(0, 7);
@@ -188,7 +198,7 @@ export default async function handler(req, context) {
       const rate = await getPricePerHour(store);
       const booking = {
         id,
-        type: bookingType === "internal" ? "internal" : "customer",
+        type: bookingType === "internal" || bookingType === "open_play" ? bookingType : "customer",
         name: name.trim(),
         phone: phone.trim(),
         date,
@@ -367,7 +377,7 @@ export default async function handler(req, context) {
       const txns = new Map();
       const txnFor = (key, seed) => {
         if (!txns.has(key)) txns.set(key, { txnId: key, createdAt: seed.createdAt, name: seed.name, phone: seed.phone,
-          source: seed.bookedByAdmin || seed.type === "internal" ? "admin" : "online", items: [] });
+          source: bookingSource(seed), items: [] });
         return txns.get(key);
       };
       const seen = new Set();
@@ -380,6 +390,8 @@ export default async function handler(req, context) {
       }
       // Bookings the admin permanently deleted still appear, from the ledger.
       for (const l of ledgers) {
+        // The ledger's record of how the transaction was made wins over later edits.
+        if (txns.has(l.txnId)) Object.assign(txns.get(l.txnId), { source: bookingSource(l), createdAt: l.createdAt, name: l.name, phone: l.phone });
         for (const it of l.items || []) {
           if (seen.has(it.id)) continue;
           txnFor(l.txnId, l).items.push({ ...it, status: "deleted" });
@@ -391,7 +403,9 @@ export default async function handler(req, context) {
           t.items.sort((a, b) => a.date.localeCompare(b.date) || a.startHour - b.startHour);
           const hours = t.items.reduce((s, i) => s + (i.endHour - i.startHour), 0);
           const amount = t.items.reduce((s, i) => s + (i.endHour - i.startHour) * i.rate, 0);
-          const billable = t.items.some(i => i.status !== "cancelled");
+          // Commission applies to online bookings and admin-added walk-ins only,
+          // and not when every booking in the transaction was cancelled.
+          const billable = BILLABLE_SOURCES.includes(t.source) && t.items.some(i => i.status !== "cancelled");
           return { ...t, hours, amount, billable, commission: billable ? COMMISSION_PER_TRANSACTION : 0 };
         })
         .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
