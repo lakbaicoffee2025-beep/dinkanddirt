@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dink &amp; Dirt Pickleball – Book a Court</title>
-<link rel="icon" type="image/jpeg" href="/assets/logo-header.jpg">
+<link rel="icon" id="siteFavicon" href="/assets/logo-header.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="/assets/carousel-1.jpg" as="image">
@@ -755,8 +755,8 @@ footer a:hover { color: var(--gold); }
   content: '';
   position: fixed;
   inset: 0;
-  background: url('/assets/carousel-1.jpg') center/cover no-repeat;
-  opacity: 0.07;
+  background: var(--booking-bg, url('/assets/carousel-1.jpg')) center/cover no-repeat;
+  opacity: var(--booking-bg-opacity, 0.07);
   pointer-events: none;
   z-index: 0;
 }
@@ -806,7 +806,7 @@ footer a:hover { color: var(--gold); }
     <p class="hero-sub1">Pickleball &amp; RC Crawler Park</p>
     <p class="hero-sub2">Play · Crawl · Repeat</p>
     <div class="hero-divider"></div>
-    <div class="hero-cta-icon" onclick="openRulesModal()"><img src="/assets/pickleball.webp" alt="Pickleball" style="width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))"></div>
+    <div class="hero-cta-icon" onclick="openRulesModal()"><img id="ctaIconImg" src="/assets/pickleball.webp" alt="Pickleball" style="width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))"></div>
     <div class="hero-cta-text" onclick="openRulesModal()">TAP TO BOOK</div>
     <p class="hero-cta-sub">Select a date and reserve your slot</p>
     <p class="hero-location">Dink &amp; Dirt &nbsp;·&nbsp; Pickleball &amp; RC Crawler Park</p>
@@ -1108,6 +1108,24 @@ async function initHero(){
   }catch(e){
     initCarousel(document.querySelectorAll('.carousel-slide').length);
   }
+}
+
+/* ── SITE IMAGES (logo, background, QR, icon — set in admin) ── */
+async function initSiteImages(){
+  try{
+    const r=await fetch(`${API}/site-images`);
+    const img=(await r.json()).images||{};
+    const root=document.documentElement.style;
+    if(img.logo){
+      document.querySelectorAll('img[src="/assets/logo-header.jpg"]').forEach(el=>{el.style.display='';el.src=img.logo;});
+      document.getElementById('siteFavicon').href=img.logo;
+    }
+    if(img.qr)document.querySelectorAll('.pay-qr').forEach(el=>el.src=img.qr);
+    if(img.ctaIcon)document.getElementById('ctaIconImg').src=img.ctaIcon;
+    if(img.backgroundHidden)root.setProperty('--booking-bg','none');
+    else if(img.background)root.setProperty('--booking-bg',`url("${img.background}")`);
+    if(typeof img.backgroundOpacity==='number')root.setProperty('--booking-bg-opacity',img.backgroundOpacity);
+  }catch(e){}
 }
 
 /* ── UTILS ── */
@@ -1435,6 +1453,7 @@ async function initBanner(){
   }catch(e){}
 }
 
+initSiteImages();
 (async()=>{await Promise.all([loadSettings(),initHero(),initBanner()]);renderCalendar();})();
 </script>
 </body>

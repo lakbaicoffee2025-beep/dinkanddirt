@@ -241,6 +241,39 @@ export default async function handler(req, context) {
       return new Response(JSON.stringify({ settings }), { headers: corsHeaders() });
     }
 
+    // GET /site-images - public
+    if (req.method === "GET" && action === "site-images") {
+      const images = (await store.get("settings_images", { type: "json" })) || {};
+      return new Response(JSON.stringify({ images }), { headers: corsHeaders() });
+    }
+
+    // POST /site-images - admin only. Only the keys sent are changed;
+    // an image key set to null resets that image to the site default.
+    if (req.method === "POST" && action === "site-images") {
+      const body = await req.json();
+      if (body.adminPassword !== ADMIN_PASSWORD) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders() });
+      }
+      const current = (await store.get("settings_images", { type: "json" })) || {};
+      const updates = body.images || {};
+      const isImage = v => typeof v === "string" && /^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(v);
+      for (const key of ["logo", "background", "qr", "ctaIcon"]) {
+        if (!(key in updates)) continue;
+        if (updates[key] === null) { delete current[key]; continue; }
+        if (!isImage(updates[key])) {
+          return new Response(JSON.stringify({ error: `Invalid image for ${key}` }), { status: 400, headers: corsHeaders() });
+        }
+        current[key] = updates[key];
+      }
+      if ("backgroundHidden" in updates) current.backgroundHidden = !!updates.backgroundHidden;
+      if ("backgroundOpacity" in updates) {
+        const o = Number(updates.backgroundOpacity);
+        if (Number.isFinite(o)) current.backgroundOpacity = Math.min(0.5, Math.max(0, o));
+      }
+      await store.setJSON("settings_images", current);
+      return new Response(JSON.stringify({ images: current }), { headers: corsHeaders() });
+    }
+
     // GET /:id
     if (req.method === "GET" && action) {
       const isAdmin = url.searchParams.get("admin") === ADMIN_PASSWORD;

@@ -311,6 +311,7 @@ tr:hover td{background:#fafaf7;}
       <div class="nav-item" onclick="showPage('block')">🚫 Block Time</div>
       <div class="nav-item" onclick="showPage('notifications')">🔔 Notifications <span id="notifBadge" style="display:none;background:#F5D311;color:#1a1a1a;border-radius:10px;padding:1px 7px;font-size:0.7rem;font-weight:700;margin-left:4px"></span></div>
       <div class="nav-item" onclick="showPage('hero')">🖼 Hero & Carousel</div>
+      <div class="nav-item" onclick="showPage('images')">🎨 Site Images</div>
       <div class="nav-item" onclick="showPage('banner')">📢 Promo Banner</div>
       <div class="nav-item" onclick="showPage('settings')">⚙️ Settings</div>
       <div class="nav-item" onclick="showPage('export')">📤 Export</div>
@@ -604,6 +605,34 @@ tr:hover td{background:#fafaf7;}
         <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn-primary" onclick="saveHeroSettings()">💾 Save Changes</button>
           <button class="btn-secondary" onclick="loadHeroSettings()">↩ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SITE IMAGES -->
+    <div class="page" id="page-images">
+      <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,0.06);max-width:760px">
+        <h3 style="font-family:'Bebas Neue',cursive;font-size:1.2rem;letter-spacing:1px;color:var(--green);margin-bottom:6px">🎨 Site Images</h3>
+        <p style="color:var(--muted);font-size:0.82rem;margin-bottom:18px">Replace the logo, booking page background, GCash QR code and "Tap to Book" icon. Top banner photos are managed in <a href="#" onclick="showPage('hero');return false" style="color:var(--green)">Hero &amp; Carousel</a>.</p>
+        <div id="imagesError" class="error-banner" style="display:none"></div>
+        <div id="imagesSuccess" class="success-banner" style="display:none"></div>
+        <div id="siteImageSlots" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px"></div>
+
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+          <label style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Booking Page Background</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.87rem;font-weight:500;margin-top:8px">
+            <input type="checkbox" id="bgHidden" onchange="onBgOptionChange()" style="width:16px;height:16px;accent-color:var(--green)"> Hide background photo
+          </label>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px;font-size:0.85rem" id="bgOpacityRow">
+            <span>Visibility</span>
+            <input type="range" id="bgOpacity" min="0" max="50" step="1" oninput="onBgOptionChange()" style="flex:1;max-width:260px;accent-color:var(--green)">
+            <span id="bgOpacityVal" style="min-width:36px;color:var(--muted)"></span>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-primary" onclick="saveSiteImages()">💾 Save Changes</button>
+          <button class="btn-secondary" onclick="loadSiteImages()">↩ Discard Changes</button>
         </div>
       </div>
     </div>
@@ -951,11 +980,11 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
-  const labels={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',banner:'Promo Banner'};
+  const labels={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',images:'Site Images',banner:'Promo Banner'};
   document.getElementById('pageTitle').textContent=labels[name]||name;
   currentPage=name;
 
-  const navMap={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',banner:'Promo Banner'};
+  const navMap={dashboard:'Dashboard',calendar:'Monthly Calendar',bookings:'All Bookings',add:'Add Booking',block:'Block Time',export:'Export',notifications:'Notifications',settings:'Settings',hero:'Hero & Carousel',images:'Site Images',banner:'Promo Banner'};
   document.querySelectorAll('.nav-item').forEach(n=>{
     if(navMap[name]&&n.textContent.includes(navMap[name]))n.classList.add('active');
   });
@@ -970,6 +999,7 @@ function showPage(name){
   if(name==='notifications'){markAllRead();loadNotifications();}
   if(name==='settings')loadAdminSettings();
   if(name==='hero')loadHeroSettings();
+  if(name==='images')loadSiteImages();
   if(name==='banner')loadBanner();
 }
 
@@ -2279,6 +2309,144 @@ function clearBanner(){
   document.getElementById('bannerPreviewWrap').style.display='none';
   document.getElementById('bannerUploadContent').innerHTML='<div style="font-size:1.5rem;margin-bottom:6px">🖼️</div><div style="font-size:0.82rem;color:var(--muted)">Click to upload banner image<br><span style="font-size:0.72rem">Recommended: 1200×300px or wider</span></div>';
   document.getElementById('bannerFileInput').value='';
+}
+
+// ─── Site Images (logo, background, QR, icon) ───────────────
+const SITE_IMAGE_SLOTS=[
+  {key:'logo',label:'Logo',def:'/assets/logo-header.jpg',hint:'Square image. Shown on the home screen, top bar, footer and browser tab.',maxPx:512,type:'image/png'},
+  {key:'background',label:'Booking Page Background',def:'/assets/carousel-1.jpg',hint:'Faint photo behind the booking page. Landscape works best.',maxPx:1600,type:'image/jpeg',quality:0.78},
+  {key:'qr',label:'GCash QR Code',def:'/assets/gcash-qr-optimized.jpg',hint:'Customers scan this to pay. Use a clear, uncropped screenshot.',maxPx:1000,type:'image/jpeg',quality:0.92},
+  {key:'ctaIcon',label:'"Tap to Book" Icon',def:'/assets/pickleball.webp',hint:'Small icon above "Tap to Book". Transparent PNG works best.',maxPx:256,type:'image/png'},
+];
+let siteImagesSaved={};   // what is on the server
+let siteImagesPending={}; // unsaved changes: key -> dataURL, or null to reset
+
+async function loadSiteImages(){
+  const errEl=document.getElementById('imagesError');
+  errEl.style.display='none';document.getElementById('imagesSuccess').style.display='none';
+  try{
+    const r=await fetch(`${API}/site-images`);
+    siteImagesSaved=(await r.json()).images||{};
+  }catch(e){errEl.textContent='Failed to load images.';errEl.style.display='block';siteImagesSaved={};}
+  siteImagesPending={};
+  document.getElementById('bgHidden').checked=!!siteImagesSaved.backgroundHidden;
+  const op=typeof siteImagesSaved.backgroundOpacity==='number'?siteImagesSaved.backgroundOpacity:0.07;
+  document.getElementById('bgOpacity').value=Math.round(op*100);
+  onBgOptionChange(true);
+  renderSiteImageSlots();
+}
+
+function currentSiteImage(key){
+  if(key in siteImagesPending)return siteImagesPending[key];
+  return siteImagesSaved[key]||null;
+}
+
+function renderSiteImageSlots(){
+  const wrap=document.getElementById('siteImageSlots');
+  wrap.innerHTML='';
+  SITE_IMAGE_SLOTS.forEach(slot=>{
+    const custom=currentSiteImage(slot.key);
+    const changed=slot.key in siteImagesPending;
+    const card=document.createElement('div');
+    card.style.cssText='border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px';
+    const title=document.createElement('div');
+    title.style.cssText='font-weight:700;font-size:0.86rem';
+    title.textContent=slot.label;
+    const status=document.createElement('span');
+    status.style.cssText='font-weight:500;font-size:0.7rem;margin-left:6px;color:'+(changed?'var(--yellow-dark)':'var(--muted)');
+    status.textContent=changed?'• unsaved':(custom?'• custom':'• default');
+    title.appendChild(status);
+    const prev=document.createElement('div');
+    prev.style.cssText='height:120px;border-radius:8px;background:#f3f4f6 center/contain no-repeat;border:1px solid var(--border)';
+    prev.style.backgroundImage=`url("${custom||slot.def}")`;
+    const hint=document.createElement('div');
+    hint.style.cssText='font-size:0.72rem;color:var(--muted);line-height:1.4';
+    hint.textContent=slot.hint;
+    const input=document.createElement('input');
+    input.type='file';input.accept='image/*';input.style.display='none';
+    input.onchange=()=>handleSiteImageUpload(slot,input);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:6px;flex-wrap:wrap';
+    const up=document.createElement('button');
+    up.className='btn-secondary';up.style.cssText='padding:7px 12px;font-size:0.78rem';
+    up.textContent='📎 Upload';up.onclick=()=>input.click();
+    btns.appendChild(up);
+    if(custom){
+      const reset=document.createElement('button');
+      reset.className='btn-secondary';reset.style.cssText='padding:7px 12px;font-size:0.78rem';
+      reset.textContent='↺ Use default';
+      reset.onclick=()=>{siteImagesPending[slot.key]=null;renderSiteImageSlots();};
+      btns.appendChild(reset);
+    }
+    card.append(title,prev,hint,input,btns);
+    wrap.appendChild(card);
+  });
+}
+
+async function handleSiteImageUpload(slot,input){
+  const file=input.files[0];
+  input.value='';
+  if(!file)return;
+  try{
+    siteImagesPending[slot.key]=await compressImageAs(file,slot.maxPx,slot.type,slot.quality);
+    renderSiteImageSlots();
+  }catch(e){
+    const errEl=document.getElementById('imagesError');
+    errEl.textContent='Could not read that image. Try a JPEG or PNG.';errEl.style.display='block';
+  }
+}
+
+function onBgOptionChange(fromLoad){
+  const hidden=document.getElementById('bgHidden').checked;
+  const val=document.getElementById('bgOpacity').value;
+  document.getElementById('bgOpacityVal').textContent=val+'%';
+  document.getElementById('bgOpacityRow').style.opacity=hidden?'0.4':'1';
+  document.getElementById('bgOpacity').disabled=hidden;
+  if(fromLoad!==true){
+    siteImagesPending.backgroundHidden=hidden;
+    siteImagesPending.backgroundOpacity=Number(val)/100;
+  }
+}
+
+async function saveSiteImages(){
+  const errEl=document.getElementById('imagesError');
+  const sucEl=document.getElementById('imagesSuccess');
+  errEl.style.display='none';sucEl.style.display='none';
+  if(!Object.keys(siteImagesPending).length){sucEl.textContent='No changes to save.';sucEl.style.display='block';return;}
+  try{
+    const r=await fetch(`${API}/site-images`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({adminPassword:adminPass,images:siteImagesPending})
+    });
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error||'Save failed.';errEl.style.display='block';return;}
+    siteImagesSaved=d.images||{};siteImagesPending={};
+    renderSiteImageSlots();
+    sucEl.textContent='Images saved! The public site will show them on next load.';
+    sucEl.style.display='block';
+    setTimeout(()=>{sucEl.style.display='none';},4000);
+  }catch(e){errEl.textContent='Network error. If you uploaded several large images, try saving them one at a time.';errEl.style.display='block';}
+}
+
+// Like compressImage, but lets PNG keep transparency (for logos/icons).
+function compressImageAs(file,maxPx,type,quality){
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      let w=img.width,h=img.height;
+      if(w>maxPx||h>maxPx){if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;}}
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      if(type==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);}
+      ctx.drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL(type,quality));
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('load failed'));};
+    img.src=url;
+  });
 }
 
 // ─── Hero & Carousel Settings ───────────────────────────────
