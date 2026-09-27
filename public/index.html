@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dink &amp; Dirt Pickleball – Book a Court</title>
+<link rel="icon" type="image/jpeg" href="/assets/logo-header.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="/assets/carousel-1.jpg" as="image">
@@ -91,9 +92,9 @@ img { max-width: 100%; display: block; }
   gap: 0;
 }
 .hero-logo-badge {
-  width: 90px; height: 90px;
+  width: clamp(150px, 32vw, 210px); height: clamp(150px, 32vw, 210px);
   border-radius: 50%;
-  background: rgba(8,18,30,.8);
+  background: #fff;
   border: 2px solid var(--gold);
   display: flex;
   align-items: center;
@@ -104,7 +105,7 @@ img { max-width: 100%; display: block; }
 }
 .hero-logo-badge img {
   width: 100%; height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 50%;
 }
 .hero-logo-badge-fallback {
@@ -320,8 +321,8 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; gap: 10px;
 }
 .topbar-logo img {
-  height: 34px; width: 34px;
-  border-radius: 50%; object-fit: cover;
+  height: 38px; width: 38px;
+  border-radius: 50%; object-fit: contain; background: #fff;
   border: 1px solid var(--gold);
 }
 .topbar-logo-text .tl-name {
@@ -802,13 +803,13 @@ footer a:hover { color: var(--gold); }
       <span class="hero-logo-badge-fallback" style="display:none">🏓</span>
     </div>
     <h1 class="hero-title">DINK &amp; DIRT</h1>
-    <p class="hero-sub1">Pickleball Court</p>
-    <p class="hero-sub2">Crafted for the Modern Game</p>
+    <p class="hero-sub1">Pickleball &amp; RC Crawler Park</p>
+    <p class="hero-sub2">Play · Crawl · Repeat</p>
     <div class="hero-divider"></div>
     <div class="hero-cta-icon" onclick="openRulesModal()"><img src="/assets/pickleball.webp" alt="Pickleball" style="width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))"></div>
     <div class="hero-cta-text" onclick="openRulesModal()">TAP TO BOOK</div>
     <p class="hero-cta-sub">Select a date and reserve your slot</p>
-    <p class="hero-location">Dink &amp; Dirt Pickleball</p>
+    <p class="hero-location">Dink &amp; Dirt &nbsp;·&nbsp; Pickleball &amp; RC Crawler Park</p>
   </div>
 
   <button class="carousel-btn prev" onclick="carouselMove(-1)">‹</button>
@@ -884,10 +885,10 @@ footer a:hover { color: var(--gold); }
       <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" onerror="this.style.display='none'">
       <div class="topbar-logo-text">
         <div class="tl-name">DINK &amp; DIRT</div>
-        <div class="tl-loc">Pickleball Court</div>
+        <div class="tl-loc">Pickleball &amp; RC Crawler Park</div>
       </div>
     </div>
-    <div class="topbar-tagline">Crafted for the Modern Game</div>
+    <div class="topbar-tagline">Play · Crawl · Repeat</div>
     <div class="topbar-contact">
       <a href="tel:09760402293">📞 0976-040-2293</a>
     </div>
@@ -1001,10 +1002,10 @@ footer a:hover { color: var(--gold); }
 
   <footer>
     <div style="margin-bottom:6px">
-      <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" style="height:26px;margin:0 auto 5px;border-radius:50%;border:1px solid rgba(201,162,39,.3);opacity:.6">
+      <img src="/assets/logo-header.jpg" alt="Dink &amp; Dirt" style="height:44px;margin:0 auto 5px;border-radius:50%;background:#fff;opacity:.85">
     </div>
     <div>📞 <a href="tel:09760402293">0976-040-2293</a> &nbsp;·&nbsp; Court Opens 1PM–12MN</div>
-    <div style="margin-top:6px;opacity:.4">© 2026 Dink &amp; Dirt Pickleball</div>
+    <div style="margin-top:6px;opacity:.4">© 2026 Dink &amp; Dirt Pickleball &amp; RC Crawler Park</div>
   </footer>
 </div>
 

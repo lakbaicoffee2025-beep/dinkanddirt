@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin – Dink &amp; Dirt Pickleball</title>
+<link rel="icon" type="image/jpeg" href="/assets/logo-header.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -2003,7 +2004,7 @@ async function pollNotifications(){
     if(newOnes.length>0){
       badge.textContent=newOnes.length;badge.style.display='inline';
       if(Notification&&Notification.permission==='granted'&&newOnes.length>0){
-        new Notification('Dink & Dirt Pickleball',{body:`${newOnes.length} new booking(s)`,icon:'/favicon.ico'});
+        new Notification('Dink & Dirt Pickleball',{body:`${newOnes.length} new booking(s)`,icon:'/assets/logo-header.jpg'});
       }
     }else{badge.style.display='none';}
   }catch(e){}
