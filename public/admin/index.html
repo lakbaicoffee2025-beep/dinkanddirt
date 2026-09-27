@@ -2314,8 +2314,8 @@ function clearBanner(){
 // ─── Site Images (logo, background, QR, icon) ───────────────
 const SITE_IMAGE_SLOTS=[
   {key:'logo',label:'Logo',def:'/assets/logo-header.jpg',hint:'Square image. Shown on the home screen, top bar, footer and browser tab.',maxPx:512,type:'image/png'},
-  {key:'background',label:'Booking Page Background',def:'/assets/carousel-1.jpg',hint:'Faint photo behind the booking page. Landscape works best.',maxPx:1600,type:'image/jpeg',quality:0.78},
-  {key:'qr',label:'GCash QR Code',def:'/assets/gcash-qr-optimized.jpg',hint:'Customers scan this to pay. Use a clear, uncropped screenshot.',maxPx:1000,type:'image/jpeg',quality:0.92},
+  {key:'background',label:'Booking Page Background',def:null,hint:'Faint photo behind the booking page. Landscape works best.',maxPx:1600,type:'image/jpeg',quality:0.78},
+  {key:'qr',label:'GCash QR Code',def:null,hint:'Customers scan this to pay. Use a clear, uncropped screenshot.',maxPx:1000,type:'image/jpeg',quality:0.92},
   {key:'ctaIcon',label:'"Tap to Book" Icon',def:'/assets/pickleball.webp',hint:'Small icon above "Tap to Book". Transparent PNG works best.',maxPx:256,type:'image/png'},
 ];
 let siteImagesSaved={};   // what is on the server
@@ -2354,11 +2354,12 @@ function renderSiteImageSlots(){
     title.textContent=slot.label;
     const status=document.createElement('span');
     status.style.cssText='font-weight:500;font-size:0.7rem;margin-left:6px;color:'+(changed?'var(--yellow-dark)':'var(--muted)');
-    status.textContent=changed?'• unsaved':(custom?'• custom':'• default');
+    status.textContent=changed?'• unsaved':(custom?'• custom':(slot.def?'• default':'• none'));
     title.appendChild(status);
     const prev=document.createElement('div');
     prev.style.cssText='height:120px;border-radius:8px;background:#f3f4f6 center/contain no-repeat;border:1px solid var(--border)';
-    prev.style.backgroundImage=`url("${custom||slot.def}")`;
+    if(custom||slot.def)prev.style.backgroundImage=`url("${custom||slot.def}")`;
+    else{prev.style.cssText+=';display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--muted)';prev.textContent=slot.key==='qr'?'No QR — hidden on site':'No photo — plain background';}
     const hint=document.createElement('div');
     hint.style.cssText='font-size:0.72rem;color:var(--muted);line-height:1.4';
     hint.textContent=slot.hint;
@@ -2374,7 +2375,7 @@ function renderSiteImageSlots(){
     if(custom){
       const reset=document.createElement('button');
       reset.className='btn-secondary';reset.style.cssText='padding:7px 12px;font-size:0.78rem';
-      reset.textContent='↺ Use default';
+      reset.textContent=slot.def?'↺ Use default':'✕ Remove';
       reset.onclick=()=>{siteImagesPending[slot.key]=null;renderSiteImageSlots();};
       btns.appendChild(reset);
     }
@@ -2516,7 +2517,7 @@ function renderHeroImages(){
   const isCarousel=document.getElementById('heroModeCarousel').checked;
   const useCustom=document.getElementById('heroUseCustom').checked;
   grid.innerHTML='';
-  if(!useCustom){grid.innerHTML='<div style="font-size:0.82rem;color:var(--muted);padding:10px 0">Using default photos from the site.</div>';return;}
+  if(!useCustom){grid.innerHTML='<div style="font-size:0.82rem;color:var(--muted);padding:10px 0">No photos — a plain Dink &amp; Dirt background is shown.</div>';return;}
   if(!heroImages.length){grid.innerHTML='<div style="font-size:0.82rem;color:var(--muted);padding:10px 0">No photos uploaded yet.</div>';return;}
   const show=isCarousel?heroImages:heroImages.slice(0,1);
   let dragSrc=null;

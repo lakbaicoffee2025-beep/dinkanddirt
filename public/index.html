@@ -7,7 +7,6 @@
 <link rel="icon" id="siteFavicon" href="/assets/logo-header.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="/assets/carousel-1.jpg" as="image">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ── TOKENS ── */
@@ -57,7 +56,9 @@ img { max-width: 100%; display: block; }
 .hero-bg {
   position: absolute;
   inset: 0;
-  background: var(--navy);
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(245,211,17,.10), transparent 55%),
+    linear-gradient(160deg, #0A1422 0%, #10284A 55%, #1A4E86 100%);
   z-index: 0;
 }
 .carousel-track {
@@ -755,7 +756,7 @@ footer a:hover { color: var(--gold); }
   content: '';
   position: fixed;
   inset: 0;
-  background: var(--booking-bg, url('/assets/carousel-1.jpg')) center/cover no-repeat;
+  background: var(--booking-bg, none) center/cover no-repeat;
   opacity: var(--booking-bg-opacity, 0.07);
   pointer-events: none;
   z-index: 0;
@@ -782,17 +783,6 @@ footer a:hover { color: var(--gold); }
 <div class="hero" id="heroSection">
   <div class="hero-bg">
     <div class="carousel-track" id="carouselTrack">
-      <div class="carousel-slide"><img src="/assets/carousel-1.jpg" alt="Court at sunset" loading="eager" fetchpriority="high"></div>
-      <div class="carousel-slide"><img src="/assets/carousel-2.jpg" alt="Players on court" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/carousel-3.jpg" alt="Venue" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/carousel-4.jpg" alt="Coffee" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/carousel-5.jpg" alt="Interior" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/carousel-6.jpg" alt="Court at night" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/venue-deck.jpg" alt="Bamboo deck" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/venue-treehouse.jpg" alt="Treehouse view" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/venue-interior.jpg" alt="Interior with lanterns" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/venue-food.jpg" alt="Food and drinks" loading="lazy" decoding="async"></div>
-      <div class="carousel-slide"><img src="/assets/venue-bar.jpg" alt="Bar counter" loading="lazy" decoding="async"></div>
     </div>
   </div>
   <div class="hero-overlay"></div>
@@ -976,8 +966,8 @@ footer a:hover { color: var(--gold); }
                   <a href="tel:09760402293" class="pay-val">0976-040-2293</a>
                 </div>
                 <div class="pay-name">Account Name: <strong>RO**E L.</strong></div>
-                <div class="pay-divider"><span>or scan QR</span></div>
-                <img src="/assets/gcash-qr-optimized.jpg" alt="GCash QR Code" class="pay-qr">
+                <div class="pay-divider" id="payQrDivider" style="display:none"><span>or scan QR</span></div>
+                <img alt="GCash QR Code" class="pay-qr" style="display:none">
                 <div class="pay-hint">After paying, upload your receipt screenshot below to secure your slot.</div>
               </div>
             </div>
@@ -1063,6 +1053,8 @@ let carouselPaused=false;
 
 function initCarousel(count){
   carouselCount=count;
+  document.querySelectorAll('.carousel-btn').forEach(b=>b.style.display=count>1?'':'none');
+  document.getElementById('carouselDots').style.display=count>1?'':'none';
   const dotsEl=document.getElementById('carouselDots');
   dotsEl.innerHTML='';
   for(let i=0;i<count;i++){
@@ -1120,7 +1112,10 @@ async function initSiteImages(){
       document.querySelectorAll('img[src="/assets/logo-header.jpg"]').forEach(el=>{el.style.display='';el.src=img.logo;});
       document.getElementById('siteFavicon').href=img.logo;
     }
-    if(img.qr)document.querySelectorAll('.pay-qr').forEach(el=>el.src=img.qr);
+    if(img.qr){
+      document.querySelectorAll('.pay-qr').forEach(el=>{el.src=img.qr;el.style.display='';});
+      document.getElementById('payQrDivider').style.display='';
+    }
     if(img.ctaIcon)document.getElementById('ctaIconImg').src=img.ctaIcon;
     if(img.backgroundHidden)root.setProperty('--booking-bg','none');
     else if(img.background)root.setProperty('--booking-bg',`url("${img.background}")`);
