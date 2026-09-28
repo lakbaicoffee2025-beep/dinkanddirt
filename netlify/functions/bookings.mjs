@@ -3,7 +3,7 @@ import { getStore } from "@netlify/blobs";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "dinkanddirt2024admin";
 // Super admin (site owner's billing view). Disabled until SUPER_ADMIN_PASSWORD is set in Netlify.
 const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD || "";
-const COMMISSION_PER_TRANSACTION = Number(process.env.COMMISSION_PER_TRANSACTION || 10);
+const COMMISSION_PER_HOUR = Number(process.env.COMMISSION_PER_HOUR || 10);
 const TEXT_KEYS = ["siteTitle", "phone", "pricePerHour", "heroTitle", "heroSub1", "heroSub2", "heroCta", "heroCtaSub", "heroLocation",
   "topbarName", "topbarSub", "topbarTagline", "rulesTitle", "rulesSubtitle", "rulesIntro",
   "rule1Title", "rule1Body", "rule2Title", "rule2Body", "rule3Title", "rule3Body", "rule4Title", "rule4Body",
@@ -193,7 +193,7 @@ export default async function handler(req, context) {
       }
       const isAdmin = adminPassword === ADMIN_PASSWORD;
       const id = generateId();
-      // Bookings made in one checkout share a txnId; commission is charged once per txnId.
+      // Bookings made in one checkout share a txnId, so the report can group them.
       const txnId = typeof rawTxnId === "string" && /^[a-z0-9]{6,40}$/i.test(rawTxnId) ? rawTxnId : id;
       const rate = await getPricePerHour(store);
       const booking = {
@@ -403,16 +403,23 @@ export default async function handler(req, context) {
           t.items.sort((a, b) => a.date.localeCompare(b.date) || a.startHour - b.startHour);
           const hours = t.items.reduce((s, i) => s + (i.endHour - i.startHour), 0);
           const amount = t.items.reduce((s, i) => s + (i.endHour - i.startHour) * i.rate, 0);
-          // Commission applies to online bookings and admin-added walk-ins only,
-          // and not when every booking in the transaction was cancelled.
-          const billable = BILLABLE_SOURCES.includes(t.source) && t.items.some(i => i.status !== "cancelled");
-          return { ...t, hours, amount, billable, commission: billable ? COMMISSION_PER_TRANSACTION : 0 };
+          // Commission is per booked hour, for online bookings and admin-added walk-ins only.
+          // Cancelled hours aren't charged; hours the admin permanently deleted still are.
+          const billedItems = BILLABLE_SOURCES.includes(t.source) ? t.items.filter(i => i.status !== "cancelled") : [];
+          const billedHours = billedItems.reduce((s, i) => s + (i.endHour - i.startHour), 0);
+          const billedAmount = billedItems.reduce((s, i) => s + (i.endHour - i.startHour) * i.rate, 0);
+          const billable = billedHours > 0;
+          return { ...t, hours, amount, billable, billedHours, billedAmount, commission: billedHours * COMMISSION_PER_HOUR };
         })
         .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-      const billableCount = transactions.filter(t => t.billable).length;
+      const billed = transactions.filter(t => t.billable);
       return new Response(JSON.stringify({
-        month, commissionPerTransaction: COMMISSION_PER_TRANSACTION, transactions,
-        totals: { transactions: transactions.length, billable: billableCount, commission: billableCount * COMMISSION_PER_TRANSACTION },
+        month, commissionPerHour: COMMISSION_PER_HOUR, transactions,
+        totals: {
+          transactions: transactions.length, billable: billed.length,
+          billedHours: billed.reduce((s, t) => s + t.billedHours, 0),
+          commission: billed.reduce((s, t) => s + t.commission, 0),
+        },
       }), { headers: corsHeaders() });
     }
 

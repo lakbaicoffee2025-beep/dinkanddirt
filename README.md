@@ -47,12 +47,12 @@ Optional — super admin (owner's commission report at `/super/`):
 
 ```
 SUPER_ADMIN_PASSWORD = a_different_secure_password
-COMMISSION_PER_TRANSACTION = 10        # optional, defaults to 10 (PHP)
+COMMISSION_PER_HOUR = 10               # optional, defaults to 10 (PHP)
 ```
 
 The super admin page is disabled until `SUPER_ADMIN_PASSWORD` is set. It lists every
-booking transaction made in a month and the commission owed (one charge per
-checkout, not per hour).
+booking transaction made in a month and the commission owed (PHP 10 per booked
+hour for online bookings and admin-added walk-ins).
 
 ### 4. Deploy via Netlify CLI
 ```bash

@@ -106,7 +106,7 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand);cursor:poi
 
   <div class="stats">
     <div class="stat"><div class="lbl">Transactions</div><div class="val" id="sTxns">–</div></div>
-    <div class="stat"><div class="lbl">Billed</div><div class="val" id="sBilled">–</div></div>
+    <div class="stat"><div class="lbl">Billed hours</div><div class="val" id="sBilled">–</div></div>
     <div class="stat"><div class="lbl">Not billed</div><div class="val" id="sWaived">–</div></div>
     <div class="stat"><div class="lbl">Court sales (billed)</div><div class="val" id="sSales">–</div></div>
     <div class="stat hl"><div class="lbl">Commission due</div><div class="val" id="sCommission">–</div></div>
@@ -114,9 +114,9 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand);cursor:poi
 
   <div class="card">
     <div class="note">
-      <strong id="rateNote">₱10 per transaction</strong> — one customer checkout counts once, however many hours or dates it covers.
-      Month is based on <strong>when the booking was made</strong> (Philippine time). Only <strong>online bookings</strong> and <strong>walk-ins added by the admin</strong> are billed; private sessions, open play and transactions where every booking was cancelled are not.
-      Bookings the admin permanently deleted are still listed (marked <span class="badge b-deleted">deleted</span>).
+      <strong id="rateNote">₱10 per hour</strong> — charged for every hour booked.
+      Month is based on <strong>when the booking was made</strong> (Philippine time). Only <strong>online bookings</strong> and <strong>walk-ins added by the admin</strong> are billed; private sessions, open play and cancelled hours are not.
+      Bookings the admin permanently deleted are still listed and billed (marked <span class="badge b-deleted">deleted</span>).
       <span class="no-print">Untick <strong>Bill</strong> to leave a transaction off this statement (not saved — for printing/export only).</span>
     </div>
     <div class="table-wrap">
@@ -194,11 +194,11 @@ function isBilled(t){return t.billable&&!waived.has(t.txnId);}
 
 function showReport(d){
   report=d;waived=new Set();
-  document.getElementById('rateNote').textContent=`${peso(d.commissionPerTransaction)} per transaction`;
+  document.getElementById('rateNote').textContent=`${peso(d.commissionPerHour)} per hour`;
   const[y,m]=d.month.split('-');
   const label=new Date(y,m-1,1).toLocaleDateString('en-PH',{month:'long',year:'numeric'});
   document.getElementById('printTitle').textContent=`Commission Statement — ${label}`;
-  document.getElementById('printSub').textContent=`Dink & Dirt Pickleball · ${peso(d.commissionPerTransaction)} per booking transaction · Generated ${new Date().toLocaleDateString('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium'})}`;
+  document.getElementById('printSub').textContent=`Dink & Dirt Pickleball · ${peso(d.commissionPerHour)} per booked hour · Generated ${new Date().toLocaleDateString('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium'})}`;
   renderRows();
 }
 
@@ -219,9 +219,9 @@ function renderRows(){
       <td>${esc(t.name)}<div class="muted">${esc(t.phone)}</div></td>
       <td>${src}</td>
       <td class="sched">${sched}</td>
-      <td class="num">${t.hours}</td>
+      <td class="num">${t.billable&&t.billedHours!==t.hours?`${t.billedHours} <span class="muted">of ${t.hours}</span>`:t.hours}</td>
       <td class="num">${peso(t.amount)}</td>
-      <td class="num"><strong>${billed?peso(report.commissionPerTransaction):'—'}</strong></td>
+      <td class="num"><strong>${billed?peso(t.commission):'—'}</strong></td>
     </tr>`;
   }).join('')+`<tr><td class="no-print"></td><td colspan="4"><strong>Total</strong></td><td class="num" id="tHours"></td><td class="num" id="tSales"></td><td class="num"><strong id="tComm"></strong></td></tr>`;
   updateTotals();
@@ -232,15 +232,15 @@ function toggleBill(id,on){if(on)waived.delete(id);else waived.add(id);renderRow
 function updateTotals(){
   const list=report?report.transactions:[];
   const billed=list.filter(isBilled);
-  const comm=billed.length*(report?report.commissionPerTransaction:0);
-  const sales=billed.reduce((s,t)=>s+t.amount,0);
+  const comm=billed.reduce((s,t)=>s+t.commission,0);
+  const sales=billed.reduce((s,t)=>s+t.billedAmount,0);
   document.getElementById('sTxns').textContent=list.length;
-  document.getElementById('sBilled').textContent=billed.length;
+  document.getElementById('sBilled').textContent=billed.reduce((s,t)=>s+t.billedHours,0);
   document.getElementById('sWaived').textContent=list.length-billed.length;
   document.getElementById('sSales').textContent=peso(sales);
   document.getElementById('sCommission').textContent=peso(comm);
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('tHours',billed.reduce((s,t)=>s+t.hours,0));
+  set('tHours',billed.reduce((s,t)=>s+t.billedHours,0));
   set('tSales',peso(sales));
   set('tComm',peso(comm));
 }
@@ -248,15 +248,15 @@ function updateTotals(){
 function exportCsv(){
   if(!report)return;
   const q=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
-  const rows=[['Transaction ID','Booked on (PH time)','Customer','Phone','Source','Schedule','Hours','Court amount','Billed','Commission']];
+  const rows=[['Transaction ID','Booked on (PH time)','Customer','Phone','Source','Schedule','Hours','Billed hours','Court amount','Billed','Commission']];
   report.transactions.forEach(t=>{
     const billed=isBilled(t);
     rows.push([t.txnId,fmtCreated(t.createdAt),t.name,t.phone,SOURCE_LABELS[t.source]||t.source,
       t.items.map(i=>`${i.date} ${fmtHour(i.startHour)}-${fmtHour(i.endHour)}${i.status!=='confirmed'?' ('+i.status+')':''}`).join('; '),
-      t.hours,t.amount,billed?'Yes':'No',billed?report.commissionPerTransaction:0]);
+      t.hours,billed?t.billedHours:0,t.amount,billed?'Yes':'No',billed?t.commission:0]);
   });
   const billed=report.transactions.filter(isBilled);
-  rows.push([],['','','','','','Total billed',billed.reduce((s,t)=>s+t.hours,0),billed.reduce((s,t)=>s+t.amount,0),billed.length,billed.length*report.commissionPerTransaction]);
+  rows.push([],['','','','','','Total billed',billed.reduce((s,t)=>s+t.hours,0),billed.reduce((s,t)=>s+t.billedHours,0),billed.reduce((s,t)=>s+t.billedAmount,0),billed.length,billed.reduce((s,t)=>s+t.commission,0)]);
   const blob=new Blob([rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`dinkanddirt-commission-${report.month}.csv`;a.click();
 }
